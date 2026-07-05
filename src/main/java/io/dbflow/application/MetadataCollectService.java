@@ -1,0 +1,105 @@
+package io.dbflow.application;
+
+import io.dbflow.domain.*;
+import io.dbflow.infrastructure.external.repository.MetadataCollector;
+import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
+import org.apache.ibatis.session.SqlSession;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class MetadataCollectService {
+    private final MetadataCollector metadataCollector;
+
+    public MetadataCollectService(MetadataCollector metadataCollector) {
+        this.metadataCollector = metadataCollector;
+    }
+
+    SnapshotService snapshotService = new SnapshotService();
+
+    public void collect(DbConfig dbConfig) {
+        try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {
+            try {
+                snapshotService.deleteCollectedSnapshot(dbConfig.getDbConfigId(), session);
+
+                tableCollect(dbConfig, session);
+                columnCollect(dbConfig, session);
+
+                session.commit();
+            } catch (Exception e) {
+                session.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void tableCollect(DbConfig dbConfig) {
+        List<TableMetadata> tableMetadataList = metadataCollector.collectTableSnapshotList(dbConfig);
+        snapshotService.insertTableSnapshotList(dbConfig.getDbConfigId(), tableMetadataList);
+    }
+
+    public void tableCollect(DbConfig dbConfig, SqlSession session) {
+        List<TableMetadata> tableMetadataList = metadataCollector.collectTableSnapshotList(dbConfig);
+        snapshotService.insertTableSnapshotList(dbConfig.getDbConfigId(), tableMetadataList, session);
+    }
+
+    public void columnCollect(DbConfig dbConfig) {
+        // 1. 이미 저장된 테이블 스냅샷 조회
+        List<CollectTableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId());
+
+        // 5. SQLite에 컬럼 스냅샷 저장
+        snapshotService.insertColumnSnapshotList(createColumnSnapshotList(dbConfig, tableSnapshotList));
+    }
+
+    public void columnCollect(DbConfig dbConfig, SqlSession session) {
+        // 1. 이미 저장된 테이블 스냅샷 조회
+        List<CollectTableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId(), session);
+
+        // 5. SQLite에 컬럼 스냅샷 저장
+        snapshotService.insertColumnSnapshotList(createColumnSnapshotList(dbConfig, tableSnapshotList), session);
+    }
+
+    private List<CollectColumnSnapshot> createColumnSnapshotList(DbConfig dbConfig, List<CollectTableSnapshot> tableSnapshotList) {
+        // 2. 외부 DB에서 컬럼 메타정보 조회
+        List<ColumnMetadata> columnMetadataList = metadataCollector.collectColumnSnapshotList(dbConfig, tableSnapshotList);
+
+        // 3. tableName -> collectTableId Map 생성
+        Map<String, Long> tableIdMap = tableSnapshotList.stream()
+                .collect(Collectors.toMap(
+                        CollectTableSnapshot::getTableName,
+                        CollectTableSnapshot::getCollectTableId
+                ));
+
+        // 4. 컬럼 메타정보를 컬럼 스냅샷으로 변환
+        List<CollectColumnSnapshot> columnSnapshotList = new ArrayList<>();
+
+        for (ColumnMetadata columnMetadata : columnMetadataList) {
+            Long collectTableId = tableIdMap.get(columnMetadata.getTableName());
+
+            if (collectTableId == null) {
+                throw new IllegalStateException("컬럼에 매칭되는 테이블 스냅샷이 없습니다. tableName=" + columnMetadata.getTableName() + ", columnName=" + columnMetadata.getColumnName());
+            }
+
+            CollectColumnSnapshot columnSnapshot = new CollectColumnSnapshot();
+
+            columnSnapshot.setCollectTableId(collectTableId);
+            columnSnapshot.setColumnName(columnMetadata.getColumnName());
+            columnSnapshot.setColumnComment(columnMetadata.getColumnComment());
+            columnSnapshot.setColumnOrder(columnMetadata.getColumnOrder());
+            columnSnapshot.setDataType(columnMetadata.getDataType());
+            columnSnapshot.setDataLength(columnMetadata.getDataLength());
+            columnSnapshot.setDataScale(columnMetadata.getDataScale());
+            columnSnapshot.setNullableYn(columnMetadata.getNullableYn());
+            columnSnapshot.setDefaultValue(columnMetadata.getDefaultValue());
+            columnSnapshot.setIdentityYn(columnMetadata.getIdentityYn());
+            columnSnapshot.setIdentityType(columnMetadata.getIdentityType());
+
+            columnSnapshotList.add(columnSnapshot);
+        }
+
+        return columnSnapshotList;
+    }
+
+}

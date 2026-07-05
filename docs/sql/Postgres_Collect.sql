@@ -1,0 +1,47 @@
+select t.table_catalog                    as db_name
+     , t.table_schema                     as scehma_name
+     , t.table_name                       as table_name
+     , case when t.table_type = 'BASE TABLE' then 'TABLE'
+            when t.table_type = 'VIEW' then 'VIEW'
+            else t.table_type
+        end                               as table_type
+     , obj_description(c.oid, 'pg_class') as table_comment
+     , pg_get_userbyid(c.relowner)        as table_owner
+  from information_schema.tables t
+ inner join pg_catalog.pg_namespace n on n.nspname = t.table_schema
+ inner join pg_catalog.pg_class c on c.relnamespace = n.oid and c.relname = t.table_name
+ where t.table_catalog = #{dbName}
+   and t.table_schema = #{dbSchema}
+   and t.table_type = 'BASE TABLE'
+ order by t.table_name
+;
+
+select c.table_catalog                                                    as db_name
+     , c.table_schema                                                     as schema_name
+     , c.table_name                                                       as table_name
+     , c.column_name                                                      as column_name
+     , d.description                                                      as column_comment
+     , c.ordinal_position::integer                                        as column_order
+     , c.data_type                                                        as data_type
+     , COALESCE(c.character_maximum_length, c.numeric_precision)::integer as data_length
+     , c.numeric_scale::integer                                           as data_scale
+     , case when c.is_nullable = 'YES' then 1
+            when c.is_nullable = 'NO' then 0
+        end                                                               as nullable_yn
+     , c.column_default                                                   as default_value
+     , case when c.is_identity = 'YES' then 1
+            when c.is_identity = 'NO' then 0
+        end                                                               as identity_yn
+     , c.identity_generation                                              as identity_type
+  from information_schema.columns c
+ inner join information_schema.tables t on t.table_catalog = c.table_catalog and t.table_schema = c.table_schema and t.table_name = c.table_name
+ inner join pg_catalog.pg_namespace n ON n.nspname = c.table_schema
+ inner join pg_catalog.pg_class pc ON pc.relnamespace = n.oid AND pc.relname = c.table_name
+  left join pg_catalog.pg_attribute a ON a.attrelid = pc.oid AND a.attname = c.column_name
+  left join pg_catalog.pg_description d ON d.objoid = pc.oid AND d.objsubid = a.attnum
+ where t.table_catalog = 'meta_db'
+   and t.table_schema = 'meta'
+   and t.table_type = 'BASE TABLE'
+   and c.table_name in ()
+ order by c.table_schema, c.table_name, c.ordinal_position
+;

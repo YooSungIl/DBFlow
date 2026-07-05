@@ -1,0 +1,22 @@
+package io.dbflow.command.work;
+
+import io.dbflow.application.WorkService;
+import io.dbflow.common.console.ConsoleHelper;
+import picocli.CommandLine.Command;
+
+@Command(
+        name = "del",
+        description = "DB작업 공간 해제"
+)
+public class WorkDelCommand implements Runnable {
+    @Override
+    public void run() {
+        try {
+            WorkService workService = new WorkService();
+            workService.delWork();
+            ConsoleHelper.success("DB작업 공간이 정상적으로 해제되었습니다.");
+        } catch (Exception e) {
+            ConsoleHelper.error(e.getMessage());
+        }
+    }
+}

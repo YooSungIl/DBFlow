@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.dbflow.infrastructure.repository.mapper.DbConfigMapper">
+
+    <insert id="insert" parameterType="io.dbflow.domain.DbConfig">
+        INSERT INTO DBF_DB_CONFIG
+        (DB_ALIAS, DB_TYPE, DB_HOST, DB_PORT, DB_NAME, DB_SCHEMA, DB_USER, DB_PASSWORD, USE_YN, CREATED_AT, UPDATED_AT)
+        VALUES (
+        #{dbAlias,jdbcType=VARCHAR},
+        #{dbType,jdbcType=VARCHAR},
+        #{dbHost,jdbcType=VARCHAR},
+        #{dbPort,jdbcType=INTEGER},
+        #{dbName,jdbcType=VARCHAR},
+        #{dbSchema,jdbcType=VARCHAR},
+        #{dbUser,jdbcType=VARCHAR},
+        #{dbPassword,jdbcType=VARCHAR},
+        #{useYn,jdbcType=INTEGER},
+        #{createdAt,jdbcType=VARCHAR},
+        #{updatedAt,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="findDbConfigList" resultType="io.dbflow.domain.DbConfig">
+        SELECT DB_CONFIG_ID
+             , DB_ALIAS
+             , DB_TYPE
+             , DB_HOST
+             , DB_PORT
+             , DB_NAME
+             , DB_SCHEMA
+             , DB_USER
+             , DB_PASSWORD
+             , USE_YN
+             , CREATED_AT
+             , UPDATED_AT
+          FROM DBF_DB_CONFIG
+    </select>
+
+    <select id="findDbConfig" resultType="io.dbflow.domain.DbConfig">
+        SELECT DB_CONFIG_ID
+             , DB_ALIAS
+             , DB_TYPE
+             , DB_HOST
+             , DB_PORT
+             , DB_NAME
+             , DB_SCHEMA
+             , DB_USER
+             , DB_PASSWORD
+             , USE_YN
+             , CREATED_AT
+             , UPDATED_AT
+          FROM DBF_DB_CONFIG
+         WHERE DB_ALIAS = #{dbAlias}
+    </select>
+
+    <update id="deleteDbConfig" parameterType="io.dbflow.domain.DbConfig">
+        UPDATE DBF_DB_CONFIG
+           SET USE_YN     = 0
+             , UPDATED_AT = #{updatedAt,jdbcType=VARCHAR}
+         WHERE DB_ALIAS   = #{dbAlias,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateDbConfig" parameterType="io.dbflow.domain.DbConfig">
+        UPDATE DBF_DB_CONFIG
+           SET DB_ALIAS    = #{dbAlias,jdbcType=VARCHAR}
+             , DB_TYPE     = #{dbType,jdbcType=VARCHAR}
+             , DB_HOST     = #{dbHost,jdbcType=VARCHAR}
+             , DB_PORT     = #{dbPort,jdbcType=INTEGER}
+             , DB_NAME     = #{dbName,jdbcType=VARCHAR}
+             , DB_SCHEMA   = #{dbSchema,jdbcType=VARCHAR}
+             , DB_USER     = #{dbUser,jdbcType=VARCHAR}
+             , DB_PASSWORD = #{dbPassword,jdbcType=VARCHAR}
+             , USE_YN      = #{useYn,jdbcType=INTEGER}
+             , UPDATED_AT  = #{updatedAt,jdbcType=VARCHAR}
+         WHERE DB_CONFIG_ID = #{dbConfigId,jdbcType=INTEGER}
+    </update>
+</mapper>

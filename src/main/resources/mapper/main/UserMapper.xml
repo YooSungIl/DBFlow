@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.dbflow.infrastructure.repository.mapper.UserMapper">
+
+    <delete id="deleteAll">
+        DELETE FROM DBF_USER
+    </delete>
+
+    <insert id="insert" parameterType="io.dbflow.domain.User">
+        INSERT INTO DBF_USER (USER_NAME, USER_EMAIL, USE_YN, CREATED_AT, UPDATED_AT)
+        VALUES (
+        #{userName,jdbcType=VARCHAR},
+        #{userEmail,jdbcType=VARCHAR},
+        #{useYn,jdbcType=INTEGER},
+        #{createdAt,jdbcType=VARCHAR},
+        #{updatedAt,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="findActiveUser" resultType="io.dbflow.domain.User">
+        SELECT
+        USER_ID,
+        DB_CONFIG_ID,
+        USER_NAME,
+        USER_EMAIL,
+        USE_YN,
+        CREATED_AT,
+        UPDATED_AT
+        FROM DBF_USER
+        WHERE USE_YN = 1
+        LIMIT 1
+    </select>
+    
+    <update id="updateCurrentDbConfigId" parameterType="io.dbflow.domain.User">
+        UPDATE DBF_USER
+           SET DB_CONFIG_ID = #{dbConfigId,jdbcType=INTEGER}
+             , UPDATED_AT = DATETIME('NOW')
+         WHERE USER_ID = #{userId,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateDelDbConfigId" parameterType="io.dbflow.domain.User">
+        UPDATE DBF_USER
+           SET DB_CONFIG_ID = NULL
+             , UPDATED_AT = DATETIME('NOW')
+         WHERE USER_ID = #{userId,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

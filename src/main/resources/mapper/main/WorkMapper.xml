@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.dbflow.infrastructure.repository.mapper.WorkMapper">
+
+    <select id="findCurrentWorkInfo" resultType="io.dbflow.domain.Work">
+        SELECT U.USER_NAME
+             , U.USER_EMAIL
+             , C.DB_ALIAS
+             , C.DB_TYPE
+             , C.DB_HOST
+             , C.DB_PORT
+             , C.DB_NAME
+             , C.DB_SCHEMA
+          FROM DBF_USER U
+         INNER JOIN DBF_DB_CONFIG C ON U.DB_CONFIG_ID = C.DB_CONFIG_ID
+    </select>
+
+    <delete id="deleteWorkChange">
+        DELETE FROM DBF_WORK_CHANGE
+              WHERE WORK_COMPONENT_ID IN (SELECT WC.WORK_COMPONENT_ID
+                                            FROM DBF_WORK_COMPONENT WC
+                                           INNER JOIN DBF_WORK_TARGET WT ON WC.WORK_TARGET_ID = WT.WORK_TARGET_ID
+                                           WHERE WT.DB_CONFIG_ID = #{dbConfigId}
+                                         )
+    </delete>
+
+    <delete id="deleteWorkComponent">
+        DELETE FROM DBF_WORK_COMPONENT
+              WHERE WORK_TARGET_ID IN (SELECT WORK_TARGET_ID
+                                         FROM DBF_WORK_TARGET
+                                        WHERE DB_CONFIG_ID = #{dbConfigId}
+                                      )
+    </delete>
+
+    <delete id="deleteWorkTarget">
+        DELETE FROM DBF_WORK_TARGET
+              WHERE DB_CONFIG_ID = #{dbConfigId}
+    </delete>
+
+    <insert id="insertWorkTarget" parameterType="io.dbflow.domain.WorkTarget"
+            useGeneratedKeys="true" keyProperty="workTargetId"
+            keyColumn="WORK_TARGET_ID">
+        INSERT INTO DBF_WORK_TARGET
+        (DB_CONFIG_ID, OBJECT_TYPE, OBJECT_NAME, OBJECT_COMMENT, CHANGE_TYPE, COMPARED_AT)
+        VALUES
+        (
+        #{dbConfigId},
+        #{objectType},
+        #{objectName},
+        #{objectComment},
+        #{changeType},
+        datetime('now', 'localtime')
+        )
+    </insert>
+
+    <insert id="insertWorkComponent" parameterType="io.dbflow.domain.WorkComponent"
+            useGeneratedKeys="true" keyProperty="workComponentId" keyColumn="WORK_COMPONENT_ID">
+        INSERT INTO DBF_WORK_COMPONENT (WORK_TARGET_ID, COMPONENT_TYPE, COMPONENT_NAME, COMPONENT_COMMENT, CHANGE_TYPE)
+        VALUES (
+        #{workTargetId},
+        #{componentType},
+        #{componentName},
+        #{componentComment},
+        #{changeType}
+        )
+    </insert>
+
+    <insert id="insertWorkChange" parameterType="io.dbflow.domain.WorkChange"
+            useGeneratedKeys="true" keyProperty="workChangeId" keyColumn="WORK_CHANGE_ID">
+        INSERT INTO DBF_WORK_CHANGE (WORK_COMPONENT_ID, CHANGE_COLUMN, BEFORE_VALUE, AFTER_VALUE)
+        VALUES (
+        #{workComponentId},
+        #{changeColumn},
+        #{beforeValue},
+        #{afterValue}
+        )
+    </insert>
+
+    <select id="findWorkTargets"
+            parameterType="long"
+            resultType="io.dbflow.domain.WorkTarget">
+        SELECT
+        WORK_TARGET_ID   AS workTargetId,
+        DB_CONFIG_ID     AS dbConfigId,
+        OBJECT_TYPE      AS objectType,
+        OBJECT_NAME      AS objectName,
+        OBJECT_COMMENT   AS objectComment,
+        CHANGE_TYPE      AS changeType,
+        COMPARED_AT      AS comparedAt
+        FROM DBF_WORK_TARGET
+        WHERE DB_CONFIG_ID = #{dbConfigId}
+        ORDER BY
+        CASE CHANGE_TYPE
+        WHEN 'ADD' THEN 1
+        WHEN 'MOD' THEN 2
+        WHEN 'DEL' THEN 3
+        ELSE 9
+        END,
+        OBJECT_NAME
+    </select>
+
+    <select id="findWorkComponents"
+            parameterType="long"
+            resultType="io.dbflow.domain.WorkComponent">
+        SELECT
+        WC.WORK_COMPONENT_ID AS workComponentId,
+        WC.WORK_TARGET_ID    AS workTargetId,
+        WC.COMPONENT_TYPE    AS componentType,
+        WC.COMPONENT_NAME    AS componentName,
+        WC.COMPONENT_COMMENT AS componentComment,
+        WC.CHANGE_TYPE       AS changeType
+        FROM DBF_WORK_COMPONENT WC
+        JOIN DBF_WORK_TARGET WT
+        ON WC.WORK_TARGET_ID = WT.WORK_TARGET_ID
+        WHERE WT.DB_CONFIG_ID = #{dbConfigId}
+        ORDER BY
+        WT.OBJECT_NAME,
+        CASE WC.COMPONENT_TYPE
+        WHEN 'TABLE' THEN 1
+        WHEN 'COLUMN' THEN 2
+        WHEN 'INDEX' THEN 3
+        WHEN 'CONSTRAINT' THEN 4
+        ELSE 9
+        END,
+        CASE WC.CHANGE_TYPE
+        WHEN 'ADD' THEN 1
+        WHEN 'MOD' THEN 2
+        WHEN 'DEL' THEN 3
+        ELSE 9
+        END,
+        WC.COMPONENT_NAME
+    </select>
+
+    <select id="findWorkChanges"
+            parameterType="long"
+            resultType="io.dbflow.domain.WorkChange">
+        SELECT
+        WCH.WORK_CHANGE_ID     AS workChangeId,
+        WCH.WORK_COMPONENT_ID  AS workComponentId,
+        WCH.CHANGE_COLUMN      AS changeColumn,
+        WCH.BEFORE_VALUE       AS beforeValue,
+        WCH.AFTER_VALUE        AS afterValue
+        FROM DBF_WORK_CHANGE WCH
+        JOIN DBF_WORK_COMPONENT WC
+        ON WCH.WORK_COMPONENT_ID = WC.WORK_COMPONENT_ID
+        JOIN DBF_WORK_TARGET WT
+        ON WC.WORK_TARGET_ID = WT.WORK_TARGET_ID
+        WHERE WT.DB_CONFIG_ID = #{dbConfigId}
+        ORDER BY
+        WT.OBJECT_NAME,
+        WC.COMPONENT_NAME,
+        WCH.CHANGE_COLUMN
+    </select>
+
+    <select id="countWorkTarget" resultType="int">
+        SELECT COUNT(*) FROM DBF_WORK_TARGET
+    </select>
+
+    <select id="findWorkTarget" resultType="io.dbflow.domain.WorkTarget">
+        SELECT WORK_TARGET_ID
+             , DB_CONFIG_ID
+             , OBJECT_TYPE
+             , OBJECT_NAME
+             , OBJECT_COMMENT
+             , CHANGE_TYPE
+             , COMPARED_AT
+          FROM DBF_WORK_TARGET
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </select>
+
+</mapper>

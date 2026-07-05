@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.dbflow.infrastructure.repository.mapper.SnapshotMapper">
+
+    <insert id="insertTableSnapshotList">
+        INSERT INTO DBF_COLLECT_TABLE_SNAPSHOT
+        (
+        DB_CONFIG_ID,
+        TABLE_NAME,
+        TABLE_COMMENT,
+        TABLE_TYPE,
+        OWNER_NAME
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{dbConfigId},
+            #{item.tableName},
+            #{item.tableComment},
+            #{item.tableType},
+            #{item.tableOwner}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertColumnSnapshotList">
+        INSERT INTO DBF_COLLECT_COLUMN_SNAPSHOT
+        (COLLECT_TABLE_ID, COLUMN_NAME, COLUMN_COMMENT, COLUMN_ORDER, DATA_TYPE,
+         DATA_LENGTH, DATA_SCALE, NULLABLE_YN, DEFAULT_VALUE, IDENTITY_YN, IDENTITY_TYPE)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.collectTableId},
+            #{item.columnName},
+            #{item.columnComment},
+            #{item.columnOrder},
+            #{item.dataType},
+            #{item.dataLength},
+            #{item.dataScale},
+            #{item.nullableYn},
+            #{item.defaultValue},
+            #{item.identityYn},
+            #{item.identityType}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectCollectTableSnapshot" resultType="io.dbflow.domain.CollectTableSnapshot">
+        SELECT COLLECT_TABLE_ID
+             , DB_CONFIG_ID
+             , TABLE_NAME
+             , TABLE_COMMENT
+             , TABLE_TYPE
+             , OWNER_NAME
+          FROM DBF_COLLECT_TABLE_SNAPSHOT
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </select>
+
+    <select id="selectCollectColumnSnapshot" resultType="io.dbflow.domain.CollectColumnSnapshot">
+        SELECT COL.COLLECT_COLUMN_ID
+             , COL.COLLECT_TABLE_ID
+             , TBL.TABLE_NAME
+             , TBL.TABLE_COMMENT
+             , TBL.TABLE_TYPE
+             , COL.COLUMN_NAME
+             , COL.COLUMN_COMMENT
+             , COL.COLUMN_ORDER
+             , COL.DATA_TYPE
+             , COL.DATA_LENGTH
+             , COL.DATA_SCALE
+             , COL.NULLABLE_YN
+             , COL.DEFAULT_VALUE
+             , COL.IDENTITY_YN
+             , COL.IDENTITY_TYPE
+          FROM DBF_COLLECT_COLUMN_SNAPSHOT COL
+         INNER JOIN DBF_COLLECT_TABLE_SNAPSHOT TBL ON COL.COLLECT_TABLE_ID = TBL.COLLECT_TABLE_ID
+         WHERE TBL.DB_CONFIG_ID = #{dbConfigId}
+         ORDER BY COL.COLLECT_TABLE_ID, COL.COLUMN_ORDER
+    </select>
+
+    <delete id="deleteCollectTableSnapshot">
+        DELETE FROM DBF_COLLECT_TABLE_SNAPSHOT
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </delete>
+
+    <delete id="deleteCollectColumnSnapshot">
+        DELETE FROM DBF_COLLECT_COLUMN_SNAPSHOT
+         WHERE COLLECT_TABLE_ID IN (SELECT COLLECT_TABLE_ID
+                                      FROM DBF_COLLECT_TABLE_SNAPSHOT
+                                     WHERE DB_CONFIG_ID = #{dbConfigId})
+    </delete>
+
+    <select id="selectCurrentTableSnapshot" resultType="io.dbflow.domain.CurrentTableSnapshot">
+        SELECT CURRENT_TABLE_ID
+             , COMMIT_LOG_ID
+             , DB_CONFIG_ID
+             , TABLE_NAME
+             , TABLE_COMMENT
+             , TABLE_TYPE
+             , OWNER_NAME
+          FROM DBF_CURRENT_TABLE_SNAPSHOT
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </select>
+
+    <select id="selectCurrentColumnSnapshot" resultType="io.dbflow.domain.CurrentColumnSnapshot">
+        SELECT COL.CURRENT_COLUMN_ID
+             , COL.CURRENT_TABLE_ID
+             , TBL.TABLE_NAME
+             , TBL.TABLE_COMMENT
+             , TBL.TABLE_TYPE
+             , COL.COLUMN_NAME
+             , COL.COLUMN_COMMENT
+             , COL.COLUMN_ORDER
+             , COL.DATA_TYPE
+             , COL.DATA_LENGTH
+             , COL.DATA_SCALE
+             , COL.NULLABLE_YN
+             , COL.DEFAULT_VALUE
+             , COL.IDENTITY_YN
+             , COL.IDENTITY_TYPE
+          FROM DBF_CURRENT_COLUMN_SNAPSHOT COL
+         INNER JOIN DBF_CURRENT_TABLE_SNAPSHOT TBL ON COL.CURRENT_TABLE_ID = TBL.CURRENT_TABLE_ID
+         WHERE TBL.DB_CONFIG_ID = #{dbConfigId}
+         ORDER BY COL.CURRENT_TABLE_ID, COL.COLUMN_ORDER
+    </select>
+
+    <delete id="deleteCommitCurrentTableSnapshot">
+        DELETE FROM DBF_CURRENT_TABLE_SNAPSHOT
+         WHERE CURRENT_TABLE_ID IN (SELECT CT.CURRENT_TABLE_ID
+                                      FROM DBF_CURRENT_TABLE_SNAPSHOT CT
+                                     INNER JOIN DBF_COMMIT_TARGET DCT
+                                        ON DCT.COMMIT_LOG_ID = #{commitLogId}
+                                       AND DCT.DB_CONFIG_ID = #{dbConfigId}
+                                       AND DCT.DB_CONFIG_ID = CT.DB_CONFIG_ID
+                                       AND DCT.OBJECT_NAME = CT.TABLE_NAME
+                                       AND DCT.OBJECT_TYPE = CT.TABLE_TYPE
+                                     WHERE CT.DB_CONFIG_ID = #{dbConfigId}
+                                   )
+    </delete>
+
+    <delete id="deleteCommitCurrentColumnSnapshot">
+        DELETE FROM DBF_CURRENT_COLUMN_SNAPSHOT
+         WHERE CURRENT_TABLE_ID IN (SELECT CT.CURRENT_TABLE_ID
+                                      FROM DBF_CURRENT_TABLE_SNAPSHOT CT
+                                     INNER JOIN DBF_COMMIT_TARGET DCT
+                                        ON DCT.COMMIT_LOG_ID = #{commitLogId}
+                                       AND DCT.DB_CONFIG_ID = #{dbConfigId}
+                                       AND DCT.DB_CONFIG_ID = CT.DB_CONFIG_ID
+                                       AND DCT.OBJECT_NAME = CT.TABLE_NAME
+                                       AND DCT.OBJECT_TYPE = CT.TABLE_TYPE
+                                     WHERE CT.DB_CONFIG_ID = #{dbConfigId}
+                                   );
+    </delete>
+
+    <insert id="insertCommitCurrentTableSnapshot">
+        INSERT INTO DBF_CURRENT_TABLE_SNAPSHOT
+        (COMMIT_LOG_ID, DB_CONFIG_ID, TABLE_NAME, TABLE_COMMENT, TABLE_TYPE, OWNER_NAME)
+        SELECT #{commitLogId}
+             , DB_CONFIG_ID
+             , TABLE_NAME
+             , TABLE_COMMENT
+             , TABLE_TYPE
+             , OWNER_NAME
+          FROM DBF_COLLECT_TABLE_SNAPSHOT
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </insert>
+
+    <insert id="insertCommitCurrentColumnSnapshot">
+        INSERT INTO DBF_CURRENT_COLUMN_SNAPSHOT
+        (CURRENT_TABLE_ID, COLUMN_NAME, COLUMN_COMMENT, COLUMN_ORDER, DATA_TYPE, DATA_LENGTH, DATA_SCALE, NULLABLE_YN, DEFAULT_VALUE, IDENTITY_YN, IDENTITY_TYPE)
+        SELECT CRT.CURRENT_TABLE_ID
+             , CLC.COLUMN_NAME
+             , CLC.COLUMN_COMMENT
+             , CLC.COLUMN_ORDER
+             , CLC.DATA_TYPE
+             , CLC.DATA_LENGTH
+             , CLC.DATA_SCALE
+             , CLC.NULLABLE_YN
+             , CLC.DEFAULT_VALUE
+             , CLC.IDENTITY_YN
+             , CLC.IDENTITY_TYPE
+          FROM DBF_COLLECT_COLUMN_SNAPSHOT CLC
+         INNER JOIN DBF_COLLECT_TABLE_SNAPSHOT CLT ON CLC.COLLECT_TABLE_ID = CLT.COLLECT_TABLE_ID
+         INNER JOIN DBF_CURRENT_TABLE_SNAPSHOT CRT ON CRT.COMMIT_LOG_ID = #{commitLogId} AND CLT.DB_CONFIG_ID = CRT.DB_CONFIG_ID AND CLT.TABLE_NAME = CRT.TABLE_NAME AND CLT.TABLE_TYPE = CRT.TABLE_TYPE
+         WHERE CLT.DB_CONFIG_ID = #{dbConfigId}
+    </insert>
+
+    <insert id="insertCommitHistoryTableSnapshot">
+        INSERT INTO DBF_HISTORY_TABLE_SNAPSHOT
+        (COMMIT_LOG_ID, DB_CONFIG_ID, TABLE_NAME, TABLE_COMMENT, TABLE_TYPE, OWNER_NAME, TABLE_DELETED_YN)
+        SELECT #{commitLogId}
+             , DB_CONFIG_ID
+             , TABLE_NAME
+             , TABLE_COMMENT
+             , TABLE_TYPE
+             , OWNER_NAME
+             , 0
+          FROM DBF_COLLECT_TABLE_SNAPSHOT
+         WHERE DB_CONFIG_ID = #{dbConfigId}
+    </insert>
+
+    <insert id="insertCommitHistoryColumnSnapshot">
+        INSERT INTO DBF_HISTORY_COLUMN_SNAPSHOT
+        (HISTORY_TABLE_ID, COLUMN_NAME, COLUMN_COMMENT, COLUMN_ORDER, DATA_TYPE, DATA_LENGTH, DATA_SCALE, NULLABLE_YN, DEFAULT_VALUE, IDENTITY_YN, IDENTITY_TYPE)
+        SELECT HTS.HISTORY_TABLE_ID
+             , CLC.COLUMN_NAME
+             , CLC.COLUMN_COMMENT
+             , CLC.COLUMN_ORDER
+             , CLC.DATA_TYPE
+             , CLC.DATA_LENGTH
+             , CLC.DATA_SCALE
+             , CLC.NULLABLE_YN
+             , CLC.DEFAULT_VALUE
+             , CLC.IDENTITY_YN
+             , CLC.IDENTITY_TYPE
+          FROM DBF_COLLECT_COLUMN_SNAPSHOT CLC
+         INNER JOIN DBF_COLLECT_TABLE_SNAPSHOT CLT ON CLC.COLLECT_TABLE_ID = CLT.COLLECT_TABLE_ID
+         INNER JOIN DBF_HISTORY_TABLE_SNAPSHOT HTS
+            ON HTS.COMMIT_LOG_ID = #{commitLogId}
+           AND HTS.DB_CONFIG_ID = CLT.DB_CONFIG_ID
+           AND CLT.TABLE_NAME = HTS.TABLE_NAME
+           AND CLT.TABLE_TYPE = HTS.TABLE_TYPE
+           AND HTS.TABLE_DELETED_YN = 0
+         WHERE CLT.DB_CONFIG_ID = #{dbConfigId}
+    </insert>
+
+    <insert id="insertCommitDeleteHistoryTableSnapshot">
+        INSERT INTO DBF_HISTORY_TABLE_SNAPSHOT
+        (COMMIT_LOG_ID, DB_CONFIG_ID, TABLE_NAME, TABLE_COMMENT, TABLE_TYPE, OWNER_NAME, TABLE_DELETED_YN)
+        SELECT #{commitLogId}
+             , CRT.DB_CONFIG_ID
+             , CRT.TABLE_NAME
+             , CRT.TABLE_COMMENT
+             , CRT.TABLE_TYPE
+             , CRT.OWNER_NAME
+             , 1
+          FROM DBF_CURRENT_TABLE_SNAPSHOT CRT
+         INNER JOIN DBF_COMMIT_TARGET DCT
+            ON DCT.COMMIT_LOG_ID = #{commitLogId}
+           AND DCT.DB_CONFIG_ID = CRT.DB_CONFIG_ID
+           AND DCT.OBJECT_NAME = CRT.TABLE_NAME
+           AND DCT.OBJECT_TYPE = CRT.TABLE_TYPE
+           AND DCT.CHANGE_TYPE = 'DEL'
+    </insert>
+
+    <insert id="insertCommitDeleteHistoryColumnSnapshot">
+        INSERT INTO DBF_HISTORY_COLUMN_SNAPSHOT
+        (HISTORY_TABLE_ID, COLUMN_NAME, COLUMN_COMMENT, COLUMN_ORDER, DATA_TYPE, DATA_LENGTH, DATA_SCALE, NULLABLE_YN, DEFAULT_VALUE, IDENTITY_YN, IDENTITY_TYPE)
+        SELECT HST.HISTORY_TABLE_ID
+             , CLC.COLUMN_NAME
+             , CLC.COLUMN_COMMENT
+             , CLC.COLUMN_ORDER
+             , CLC.DATA_TYPE
+             , CLC.DATA_LENGTH
+             , CLC.DATA_SCALE
+             , CLC.NULLABLE_YN
+             , CLC.DEFAULT_VALUE
+             , CLC.IDENTITY_YN
+             , CLC.IDENTITY_TYPE
+          FROM DBF_CURRENT_COLUMN_SNAPSHOT CLC
+         INNER JOIN DBF_CURRENT_TABLE_SNAPSHOT CRT ON CLC.CURRENT_TABLE_ID = CRT.CURRENT_TABLE_ID
+         INNER JOIN DBF_COMMIT_TARGET DCT
+            ON DCT.COMMIT_LOG_ID = #{commitLogId}
+           AND DCT.DB_CONFIG_ID = CRT.DB_CONFIG_ID
+           AND DCT.OBJECT_NAME = CRT.TABLE_NAME
+           AND DCT.OBJECT_TYPE = CRT.TABLE_TYPE
+           AND DCT.CHANGE_TYPE = 'DEL'
+         INNER JOIN DBF_HISTORY_TABLE_SNAPSHOT HST
+            ON HST.COMMIT_LOG_ID = #{commitLogId}
+           AND HST.DB_CONFIG_ID = CRT.DB_CONFIG_ID
+           AND HST.TABLE_NAME = CRT.TABLE_NAME
+           AND HST.TABLE_TYPE = CRT.TABLE_TYPE
+           AND HST.TABLE_DELETED_YN = 1
+    </insert>
+</mapper>
