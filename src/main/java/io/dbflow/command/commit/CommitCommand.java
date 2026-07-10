@@ -8,7 +8,11 @@ import picocli.CommandLine.Command;
 
 @Command(
         name = "commit",
-        description = "작업 변경내역을 커밋합니다."
+        description = "작업 변경내역을 커밋합니다.",
+        subcommands = {
+                CommitListCommand.class,
+                CommitShowCommand.class
+        }
 )
 public class CommitCommand implements Runnable {
 

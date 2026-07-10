@@ -1,7 +1,13 @@
 package io.dbflow.infrastructure.repository.mapper;
 
 import io.dbflow.domain.CommitLog;
+import io.dbflow.domain.User;
+import io.dbflow.dto.CommitComponentChangeView;
+import io.dbflow.dto.CommitLogView;
+import io.dbflow.dto.CommitTargetView;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface CommitMapper {
 
@@ -13,9 +19,14 @@ public interface CommitMapper {
 
     void insertCommitChangeFromWork(@Param("commitLogId") Long commitLogId, @Param("dbConfigId") Long dbConfigId);
 
-    void deleteWorkChange(@Param("dbConfigId") Long dbConfigId);
+    List<CommitLogView> selectCommitLogList(@Param("user") User user, @Param("limit") int limit);
 
-    void deleteWorkComponent(@Param("dbConfigId") Long dbConfigId);
+    CommitLogView selectCommitLog(@Param("user") User user, @Param("commitLogId") Long commitLogId);
 
-    void deleteWorkTarget(@Param("dbConfigId") Long dbConfigId);
+    List<CommitTargetView> selectCommitTargetList(@Param("commitLogId") Long commitLogId);
+
+    CommitTargetView selectCommitTarget(@Param("commitLogId") Long commitLogId, @Param("objectName") String objectName);
+
+    List<CommitComponentChangeView> selectCommitComponentChangeList(@Param("commitTargetId") Long commitTargetId, @Param("componentName") String componentName);
+
 }

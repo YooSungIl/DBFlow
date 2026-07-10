@@ -104,24 +104,71 @@
         WHERE WT.DB_CONFIG_ID = #{dbConfigId}
     </insert>
 
-    <delete id="deleteWorkChange">
-        DELETE FROM DBF_WORK_CHANGE
-         WHERE WORK_COMPONENT_ID IN (SELECT WC.WORK_COMPONENT_ID
-                                       FROM DBF_WORK_COMPONENT WC
-                                      INNER JOIN DBF_WORK_TARGET WT ON WC.WORK_TARGET_ID = WT.WORK_TARGET_ID
-                                      WHERE WT.DB_CONFIG_ID = #{dbConfigId})
-    </delete>
+    <select id="selectCommitLogList" resultType="io.dbflow.dto.CommitLogView">
+        SELECT DCL.COMMIT_LOG_ID
+             , DDC.DB_ALIAS
+             , DDC.DB_NAME
+             , DCL.COMMIT_TITLE
+             , DCL.COMMIT_CONTENT
+             , DCL.USER_ID
+             , DCL.COMMIT_CREATED_AT
+          FROM DBF_COMMIT_LOG DCL
+         INNER JOIN DBF_DB_CONFIG DDC ON DCL.DB_CONFIG_ID = DDC.DB_CONFIG_ID
+         WHERE DCL.DB_CONFIG_ID = #{user.dbConfigId}
+         ORDER BY COMMIT_LOG_ID
+         LIMIT #{limit}
+    </select>
 
-    <delete id="deleteWorkComponent">
-        DELETE FROM DBF_WORK_COMPONENT
-         WHERE WORK_TARGET_ID IN (SELECT WORK_TARGET_ID
-                                    FROM DBF_WORK_TARGET
-                                   WHERE DB_CONFIG_ID = #{dbConfigId})
-    </delete>
+    <select id="selectCommitLog" resultType="io.dbflow.dto.CommitLogView">
+        SELECT DCL.COMMIT_LOG_ID
+             , DDC.DB_ALIAS
+             , DDC.DB_NAME
+             , DCL.COMMIT_TITLE
+             , DCL.COMMIT_CONTENT
+             , DCL.USER_ID
+             , DCL.COMMIT_CREATED_AT
+          FROM DBF_COMMIT_LOG DCL
+         INNER JOIN DBF_DB_CONFIG DDC ON DCL.DB_CONFIG_ID = DDC.DB_CONFIG_ID
+         WHERE DCL.DB_CONFIG_ID = #{user.dbConfigId}
+           AND DCL.COMMIT_LOG_ID = #{commitLogId}
+    </select>
 
-    <delete id="deleteWorkTarget">
-        DELETE FROM DBF_WORK_TARGET
-         WHERE DB_CONFIG_ID = #{dbConfigId}
-    </delete>
+    <select id="selectCommitTargetList" resultType="io.dbflow.dto.CommitTargetView">
+        SELECT DCT.OBJECT_TYPE
+             , DCT.OBJECT_NAME
+             , DCT.OBJECT_COMMENT
+             , DCT.CHANGE_TYPE
+          FROM DBF_COMMIT_TARGET DCT
+         WHERE DCT.COMMIT_LOG_ID = #{commitLogId}
+         ORDER BY CASE DCT.CHANGE_TYPE WHEN 'ADD' THEN 1 WHEN 'MOD' THEN 2 WHEN 'DEL' THEN 3 ELSE 99 END, DCT.COMMIT_TARGET_ID
+    </select>
 
+    <select id="selectCommitTarget" resultType="io.dbflow.dto.CommitTargetView">
+        SELECT DCT.COMMIT_TARGET_ID
+             , DCT.OBJECT_TYPE
+             , DCT.OBJECT_NAME
+             , DCT.OBJECT_COMMENT
+             , DCT.CHANGE_TYPE
+          FROM DBF_COMMIT_TARGET DCT
+         WHERE DCT.COMMIT_LOG_ID = #{commitLogId}
+           AND DCT.OBJECT_NAME = #{objectName}
+    </select>
+
+    <select id="selectCommitComponentChangeList" resultType="io.dbflow.dto.CommitComponentChangeView">
+        SELECT COM.COMPONENT_TYPE
+             , COM.COMPONENT_NAME
+             , COM.COMPONENT_COMMENT
+             , COM.CHANGE_TYPE
+             , CHA.CHANGE_COLUMN
+             , CHA.BEFORE_VALUE
+             , CHA.AFTER_VALUE
+          FROM DBF_COMMIT_COMPONENT COM
+         INNER JOIN DBF_COMMIT_CHANGE CHA ON COM.COMMIT_COMPONENT_ID = CHA.COMMIT_COMPONENT_ID
+         WHERE COM.COMMIT_TARGET_ID = #{commitTargetId}
+        <if test="componentName != null and componentName != ''">
+           AND COM.COMPONENT_NAME = #{componentName}
+        </if>
+         ORDER BY CASE COM.CHANGE_TYPE WHEN 'ADD' THEN 1 WHEN 'MOD' THEN 2 WHEN 'DEL' THEN 3 ELSE 99 END
+                , COM.COMMIT_COMPONENT_ID
+    </select>
 </mapper>

@@ -1,17 +1,18 @@
-package io.dbflow.domain;
+package io.dbflow.dto;
 
 import java.util.List;
 
-public class CommitLog {
+public class CommitLogView {
 
     private Long commitLogId;
-    private Long dbConfigId;
+    private String dbAlias;
+    private String dbName;
     private String commitTitle;
     private String commitContent;
     private Long userId;
     private String commitCreatedAt;
 
-    private List<WorkTarget> workTargets;
+    List<CommitTargetView> commitTargetViewList;
 
     public Long getCommitLogId() {
         return commitLogId;
@@ -21,12 +22,20 @@ public class CommitLog {
         this.commitLogId = commitLogId;
     }
 
-    public Long getDbConfigId() {
-        return dbConfigId;
+    public String getDbAlias() {
+        return dbAlias;
     }
 
-    public void setDbConfigId(Long dbConfigId) {
-        this.dbConfigId = dbConfigId;
+    public void setDbAlias(String dbAlias) {
+        this.dbAlias = dbAlias;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 
     public String getCommitTitle() {
@@ -59,5 +68,13 @@ public class CommitLog {
 
     public void setCommitCreatedAt(String commitCreatedAt) {
         this.commitCreatedAt = commitCreatedAt;
+    }
+
+    public List<CommitTargetView> getCommitTargetViewList() {
+        return commitTargetViewList;
+    }
+
+    public void setCommitTargetViewList(List<CommitTargetView> commitTargetViewList) {
+        this.commitTargetViewList = commitTargetViewList;
     }
 }

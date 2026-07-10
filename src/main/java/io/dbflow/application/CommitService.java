@@ -3,6 +3,7 @@ package io.dbflow.application;
 import io.dbflow.common.Exception.ServiceException;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.User;
+import io.dbflow.dto.CommitLogView;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import io.dbflow.infrastructure.repository.CommitRepository;
 import io.dbflow.infrastructure.repository.SnapshotRepository;
@@ -10,6 +11,7 @@ import io.dbflow.infrastructure.repository.UserRepository;
 import org.apache.ibatis.session.SqlSession;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class CommitService {
 
@@ -54,5 +56,33 @@ public class CommitService {
                 throw new RuntimeException(e.getMessage());
             }
         }
+    }
+
+    public List<CommitLogView> commitLogList(int limit) {
+        UserService userService = new UserService(new UserRepository());
+        User user = userService.findActiveUser();
+
+        return commitRepository.selectCommitLogList(user, limit);
+    }
+
+    public CommitLogView commitTargetList(Long commitLogId) {
+        UserService userService = new UserService(new UserRepository());
+        User user = userService.findActiveUser();
+
+        return commitRepository.selectCommitTargetList(user, commitLogId);
+    }
+
+    public CommitLogView commitObjectDetail(Long commitLogId, String objectName) {
+        UserService userService = new UserService(new UserRepository());
+        User user = userService.findActiveUser();
+
+        return commitRepository.selectCommitObjectDetail(user, commitLogId, objectName);
+    }
+
+    public CommitLogView commitComponentDetail(Long commitLogId, String objectName, String componentName) {
+        UserService userService = new UserService(new UserRepository());
+        User user = userService.findActiveUser();
+
+        return commitRepository.selectCommitComponentDetail(user, commitLogId, objectName, componentName);
     }
 }
