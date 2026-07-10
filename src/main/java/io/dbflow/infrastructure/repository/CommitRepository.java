@@ -28,7 +28,7 @@ public class CommitRepository {
 
         } catch (Exception e) {
             session.rollback();
-            throw new RepositoryException("커밋 저장 중 오류가 발생했습니다.", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -46,7 +46,14 @@ public class CommitRepository {
             CommitMapper commitMapper = session.getMapper(CommitMapper.class);
 
             CommitLogView commitLogView = commitMapper.selectCommitLog(user, commitLogId);
+            if (commitLogView == null) {
+                throw new RepositoryException(RepositoryException.COMMIT_NOT_FOUND);
+            }
+
             List<CommitTargetView> commitTargetView = commitMapper.selectCommitTargetList(commitLogView.getCommitLogId());
+            if (commitTargetView == null || commitTargetView.isEmpty()) {
+                throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
+            }
 
             commitLogView.setCommitTargetViewList(commitTargetView);
             return commitLogView;
@@ -60,13 +67,20 @@ public class CommitRepository {
             CommitMapper commitMapper = session.getMapper(CommitMapper.class);
 
             CommitLogView commit = commitMapper.selectCommitLog(user, commitLogId);
+            if (commit == null) {
+                throw new RepositoryException(RepositoryException.COMMIT_NOT_FOUND);
+            }
+
             CommitTargetView target = commitMapper.selectCommitTarget(commitLogId, objectName);
 
             if (target == null) {
-                throw new RepositoryException("해당 커밋에 대상 오브젝트가 없습니다.");
+                throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
             }
 
             List<CommitComponentChangeView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), null);
+            if (changes == null || changes.isEmpty()) {
+                throw new RepositoryException(RepositoryException.COMMIT_COMPONENT_NOT_FOUND);
+            }
 
             target.setCommitComponentChangeViews(changes);
             commit.setCommitTargetViewList(List.of(target));
@@ -80,13 +94,20 @@ public class CommitRepository {
             CommitMapper commitMapper = session.getMapper(CommitMapper.class);
 
             CommitLogView commit = commitMapper.selectCommitLog(user, commitLogId);
+            if (commit == null) {
+                throw new RepositoryException(RepositoryException.COMMIT_NOT_FOUND);
+            }
+
             CommitTargetView target = commitMapper.selectCommitTarget(commitLogId, objectName);
 
             if (target == null) {
-                throw new RepositoryException("해당 커밋에 대상 오브젝트가 없습니다.");
+                throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
             }
 
             List<CommitComponentChangeView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), componentName);
+            if (changes == null || changes.isEmpty()) {
+                throw new RepositoryException(RepositoryException.COMMIT_COMPONENT_NOT_FOUND);
+            }
 
             target.setCommitComponentChangeViews(changes);
             commit.setCommitTargetViewList(List.of(target));

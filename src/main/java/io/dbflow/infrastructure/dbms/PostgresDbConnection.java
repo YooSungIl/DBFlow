@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import io.dbflow.common.Exception.DbConnectionException;
+import io.dbflow.common.Exception.ServiceException;
 import io.dbflow.domain.DbConfig;
 
 public class PostgresDbConnection implements DbConnection{
@@ -15,12 +15,12 @@ public class PostgresDbConnection implements DbConnection{
             Class.forName("org.postgresql.Driver");
 
             try (Connection connection = getConnection(config)) {
-                System.out.println("PostgreSQL JDBC Driver Connected successfully");
+                connection.isValid(3);
             }
         } catch (ClassNotFoundException e) {
-            throw new DbConnectionException("PostgreSQL JDBC Driver를 찾을 수 없습니다.", e);
+            throw new ServiceException("PostgreSQL JDBC Driver를 찾을 수 없습니다.", e);
         } catch (SQLException e) {
-            throw new DbConnectionException("DB 연결 실패 : " + e.getMessage());
+            throw new ServiceException("DB 연결 실패 : " + e.getMessage(), e);
         }
     }
 

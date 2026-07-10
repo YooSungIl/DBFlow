@@ -1,6 +1,7 @@
 package io.dbflow.application;
 
 import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.DateTimeHelper;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.User;
 import io.dbflow.dto.CommitLogView;
@@ -10,7 +11,6 @@ import io.dbflow.infrastructure.repository.SnapshotRepository;
 import io.dbflow.infrastructure.repository.UserRepository;
 import org.apache.ibatis.session.SqlSession;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class CommitService {
@@ -20,18 +20,22 @@ public class CommitService {
 
     public void commit(String title, String content) {
         if (title == null || title.isBlank()) {
-            throw new ServiceException("커밋 제목을 입력해주세요.");
-        }
-
-        WorkService workService = new WorkService();
-        int workCount = workService.countWorkTarget();
-
-        if (workCount == 0) {
-            throw new ServiceException("커밋할 변경내역이 없습니다. 먼저 dbf diff 명령어를 실행해주세요.");
+            throw new ServiceException(ServiceException.COMMIT_TITLE_REQUIRED);
         }
 
         UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
+
+        if (user == null) {
+            throw new ServiceException(ServiceException.USER_NOT_FOUND);
+        }
+
+        WorkService workService = new WorkService();
+        int workCount = workService.countWorkTarget(user.getDbConfigId());
+
+        if (workCount == 0) {
+            throw new ServiceException(ServiceException.COMMIT_WORK_NOT_FOUND);
+        }
 
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {
             try {
@@ -40,20 +44,16 @@ public class CommitService {
                 commitLog.setCommitTitle(title);
                 commitLog.setCommitContent(content);
                 commitLog.setUserId(user.getUserId());
-                commitLog.setCommitCreatedAt(LocalDateTime.now().toString());
+                commitLog.setCommitCreatedAt(DateTimeHelper.now());
 
                 commitRepository.commitWork(commitLog, session);
                 snapshotRepository.insertCommitHistorySnapshot(commitLog, session);
                 snapshotRepository.insertCommitCurrentSnapshot(commitLog, session);
 
                 session.commit();
-
-                System.out.println();
-                System.out.println("커밋이 완료되었습니다.");
-                System.out.println("Commit title : " + title);
             } catch (Exception e) {
                 session.rollback();
-                throw new RuntimeException(e.getMessage());
+                throw new ServiceException(e.getMessage(), e);
             }
         }
     }

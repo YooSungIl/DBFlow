@@ -50,14 +50,14 @@ public class ConnectService {
         DbConfig exists = dbConfigRepository.findDbConfig(alias);
 
         if (exists != null) {
-            throw new ValidationException("이미 존재하는 DB 별칭입니다.");
+            throw new ValidationException(ValidationException.DUPLICATED_DB_ALIAS);
         }
     }
 
     private DbConnection getDbConnection(String dbType) {
         return switch (dbType) {
             case "POSTGRESQL" -> new PostgresDbConnection();
-            default -> throw new ValidationException("지원하지 않는 DBMS입니다.");
+            default -> throw new ValidationException(ValidationException.UNSUPPORTED_DBMS);
         };
     }
 }

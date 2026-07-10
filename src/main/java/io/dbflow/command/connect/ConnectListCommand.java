@@ -2,7 +2,6 @@ package io.dbflow.command.connect;
 
 import io.dbflow.application.ConnectService;
 import io.dbflow.common.console.ConsoleHelper;
-import io.dbflow.common.console.TablePrinter;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.infrastructure.repository.DbConfigRepository;
 import picocli.CommandLine;
@@ -24,7 +23,7 @@ public class ConnectListCommand implements Runnable {
             if (dbConfig == null) {
                 ConsoleHelper.info("등록된 DB접속 정보가 없습니다.");
             } else {
-                TablePrinter.printDbConfigList(dbConfig);
+                ConsoleHelper.printDbConfigList(dbConfig);
             }
         } catch (Exception e) {
             ConsoleHelper.error(e.getMessage());

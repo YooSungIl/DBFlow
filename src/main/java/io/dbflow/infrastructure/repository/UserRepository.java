@@ -20,7 +20,7 @@ public class UserRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("사용자 정보 저장 중 오류가 발생했습니다", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -31,7 +31,7 @@ public class UserRepository {
 
             return userMapper.findActiveUser();
         } catch (Exception e) {
-            throw new RepositoryException("사용자 정보 조회 중 오류가 발생했습니다", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -43,7 +43,7 @@ public class UserRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("DB작업 설정 정보 업데이트 중 오류가 발생했습니다", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -56,7 +56,7 @@ public class UserRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("DB작업 설정 정보 업데이트 중 오류가 발생했습니다", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }

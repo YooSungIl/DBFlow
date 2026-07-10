@@ -16,7 +16,7 @@ public class WorkRepository {
             WorkMapper workMapper = session.getMapper(WorkMapper.class);
             return workMapper.findCurrentWorkInfo();
         } catch (Exception e) {
-            throw new RepositoryException("DB작업 공간 정보 조회 중 오류가 발생했습니다", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -32,7 +32,7 @@ public class WorkRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("DB접속정보 비활성화 UPDATE 중 오류가 발생했습니다.", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -61,7 +61,7 @@ public class WorkRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("작업 변경내역 저장 중 오류가 발생했습니다.", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -102,12 +102,12 @@ public class WorkRepository {
         return targets;
     }
 
-    public int countWorkTarget() {
+    public int countWorkTarget(Long dbConfigId) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             WorkMapper mapper = session.getMapper(WorkMapper.class);
-            return mapper.countWorkTarget();
+            return mapper.countWorkTarget(dbConfigId);
         } catch (Exception e) {
-            throw new RepositoryException("작업 변경내역 조회 중 오류가 발생했습니다.", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -116,7 +116,7 @@ public class WorkRepository {
             WorkMapper mapper = session.getMapper(WorkMapper.class);
             return mapper.findWorkTarget(dbConfigId);
         } catch (Exception e) {
-            throw new RepositoryException("작업 변경내역 조회 중 오류가 발생했습니다.", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 }

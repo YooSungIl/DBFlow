@@ -2,7 +2,6 @@ package io.dbflow.command.commit;
 
 import io.dbflow.application.CommitService;
 import io.dbflow.common.console.ConsoleHelper;
-import io.dbflow.common.console.TablePrinter;
 import io.dbflow.dto.CommitLogView;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -29,10 +28,10 @@ public class CommitListCommand implements Runnable {
             CommitService commitService = new CommitService();
 
             List<CommitLogView> commitLogList = commitService.commitLogList(limit);
-            if (commitLogList == null) {
+            if (commitLogList == null || commitLogList.isEmpty()) {
                 ConsoleHelper.info("등록된 커밋 정보가 없습니다.");
             } else {
-                TablePrinter.printCommitLogList(commitLogList);
+                ConsoleHelper.printCommitLogList(commitLogList);
             }
         } catch (Exception e) {
             ConsoleHelper.error(e.getMessage());

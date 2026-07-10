@@ -154,8 +154,9 @@
         WCH.CHANGE_COLUMN
     </select>
 
-    <select id="countWorkTarget" resultType="int">
+    <select id="countWorkTarget" parameterType="long" resultType="int">
         SELECT COUNT(*) FROM DBF_WORK_TARGET
+         WHERE DB_CONFIG_ID = #{dbConfigId}
     </select>
 
     <select id="findWorkTarget" resultType="io.dbflow.domain.WorkTarget">

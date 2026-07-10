@@ -1,6 +1,10 @@
 package io.dbflow.application;
 
 import io.dbflow.domain.*;
+import io.dbflow.common.enums.ChangeColumn;
+import io.dbflow.common.enums.ChangeType;
+import io.dbflow.common.enums.ComponentType;
+import io.dbflow.common.enums.ObjectType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +36,7 @@ public class CompareService {
 
             //현재 테이블에 데이터가 없을 경우 신규 등록
             if (current == null) {
-                result.addTarget(new WorkTarget(dbConfigId, "TABLE", collect.getTableName(), collect.getTableComment(), "ADD"));
+                result.addTarget(new WorkTarget(dbConfigId, ObjectType.TABLE.name(), collect.getTableName(), collect.getTableComment(), ChangeType.ADD.name()));
                 continue;
             }
 
@@ -40,9 +44,9 @@ public class CompareService {
             WorkTarget target = null;
 
             if (!Objects.equals(collect.getTableComment(), current.getTableComment())) {
-                target = new WorkTarget(dbConfigId, "TABLE", collect.getTableName(), collect.getTableComment(), "MOD");
-                WorkComponent component = target.addComponent(new WorkComponent("TABLE", collect.getTableName(), collect.getTableComment(), "MOD"));
-                component.addChange(new WorkChange("TABLE_COMMENT", current.getTableComment(), collect.getTableComment()));
+                target = new WorkTarget(dbConfigId, ObjectType.TABLE.name(), collect.getTableName(), collect.getTableComment(), ChangeType.MOD.name());
+                WorkComponent component = target.addComponent(new WorkComponent(ComponentType.TABLE.name(), collect.getTableName(), collect.getTableComment(), ChangeType.MOD.name()));
+                component.addChange(new WorkChange(ChangeColumn.TABLE_COMMENT.name(), current.getTableComment(), collect.getTableComment()));
             }
 
             if (target != null) {
@@ -54,7 +58,7 @@ public class CompareService {
         for (String tableName : currentMap.keySet()) {
             if (!collectMap.containsKey(tableName)) {
                 CurrentTableSnapshot current = currentMap.get(tableName);
-                result.addTarget(new WorkTarget(dbConfigId, "TABLE", current.getTableName(), current.getTableComment(), "DEL"));
+                result.addTarget(new WorkTarget(dbConfigId, ObjectType.TABLE.name(), current.getTableName(), current.getTableComment(), ChangeType.DEL.name()));
             }
         }
     }
@@ -74,7 +78,7 @@ public class CompareService {
             WorkTarget target = targetMap.get(tableName);
 
             // 테이블 ADD / DEL은 컬럼 비교 제외
-            if (target != null && !"MOD".equals(target.getChangeType())) {
+            if (target != null && !ChangeType.MOD.name().equals(target.getChangeType())) {
                 continue;
             }
 
@@ -105,7 +109,7 @@ public class CompareService {
                 //이 컬럼이 속한 테이블이 없는 경우 workTarget 생성
                 target = getOrCreateModTarget(result, targetMap, collect);
 
-                target.addComponent(new WorkComponent("COLUMN", collect.getColumnName(), collect.getColumnComment(), "ADD"));
+                target.addComponent(new WorkComponent(ComponentType.COLUMN.name(), collect.getColumnName(), collect.getColumnComment(), ChangeType.ADD.name()));
                 continue;
             }
 
@@ -125,24 +129,24 @@ public class CompareService {
                 CurrentColumnSnapshot current = currentColumnMap.get(columnName);
                 WorkTarget target = getOrCreateModTarget(result, targetMap, current);
 
-                target.addComponent(new WorkComponent("COLUMN", current.getColumnName(), current.getColumnComment(), "DEL"
+                target.addComponent(new WorkComponent(ComponentType.COLUMN.name(), current.getColumnName(), current.getColumnComment(), ChangeType.DEL.name()
                 ));
             }
         }
     }
 
     private WorkComponent compareColumnProperties(CollectColumnSnapshot collect, CurrentColumnSnapshot current) {
-        WorkComponent component = new WorkComponent("COLUMN", collect.getColumnName(), collect.getColumnComment(), "MOD");
+        WorkComponent component = new WorkComponent(ComponentType.COLUMN.name(), collect.getColumnName(), collect.getColumnComment(), ChangeType.MOD.name());
 
-        addChangeIfDifferent(component, "COLUMN_ORDER", current.getColumnOrder(), collect.getColumnOrder());
-        addChangeIfDifferent(component, "DATA_TYPE", current.getDataType(), collect.getDataType());
-        addChangeIfDifferent(component, "DATA_LENGTH", current.getDataLength(), collect.getDataLength());
-        addChangeIfDifferent(component, "DATA_SCALE", current.getDataScale(), collect.getDataScale());
-        addChangeIfDifferent(component, "NULLABLE_YN", current.getNullableYn(), collect.getNullableYn());
-        addChangeIfDifferent(component, "DATA_DEFAULT", current.getDefaultValue(), collect.getDefaultValue());
-        addChangeIfDifferent(component, "IDENTITY_YN", current.getIdentityYn(), collect.getIdentityYn());
-        addChangeIfDifferent(component, "IDENTITY_TYPE", current.getIdentityType(), collect.getIdentityType());
-        addChangeIfDifferent(component, "COLUMN_COMMENT", current.getColumnComment(), collect.getColumnComment());
+        addChangeIfDifferent(component, ChangeColumn.COLUMN_ORDER, current.getColumnOrder(), collect.getColumnOrder());
+        addChangeIfDifferent(component, ChangeColumn.DATA_TYPE, current.getDataType(), collect.getDataType());
+        addChangeIfDifferent(component, ChangeColumn.DATA_LENGTH, current.getDataLength(), collect.getDataLength());
+        addChangeIfDifferent(component, ChangeColumn.DATA_SCALE, current.getDataScale(), collect.getDataScale());
+        addChangeIfDifferent(component, ChangeColumn.NULLABLE_YN, current.getNullableYn(), collect.getNullableYn());
+        addChangeIfDifferent(component, ChangeColumn.DEFAULT_VALUE, current.getDefaultValue(), collect.getDefaultValue());
+        addChangeIfDifferent(component, ChangeColumn.IDENTITY_YN, current.getIdentityYn(), collect.getIdentityYn());
+        addChangeIfDifferent(component, ChangeColumn.IDENTITY_TYPE, current.getIdentityType(), collect.getIdentityType());
+        addChangeIfDifferent(component, ChangeColumn.COLUMN_COMMENT, current.getColumnComment(), collect.getColumnComment());
 
         if (component.getChanges().isEmpty()) {
             return null;
@@ -151,9 +155,9 @@ public class CompareService {
         return component;
     }
 
-    private void addChangeIfDifferent(WorkComponent component, String changeColumn, Object beforeValue, Object afterValue) {
+    private void addChangeIfDifferent(WorkComponent component, ChangeColumn changeColumn, Object beforeValue, Object afterValue) {
         if (!Objects.equals(beforeValue, afterValue)) {
-            component.addChange(new WorkChange(changeColumn, String.valueOf(beforeValue), String.valueOf(afterValue)));
+            component.addChange(new WorkChange(changeColumn.name(), String.valueOf(beforeValue), String.valueOf(afterValue)));
         }
     }
 
@@ -172,7 +176,7 @@ public class CompareService {
             return target;
         }
 
-        target = new WorkTarget(null, "TABLE", tableName, tableComment, "MOD");
+        target = new WorkTarget(null, ObjectType.TABLE.name(), tableName, tableComment, ChangeType.MOD.name());
 
         result.addTarget(target);
         targetMap.put(tableName, target);

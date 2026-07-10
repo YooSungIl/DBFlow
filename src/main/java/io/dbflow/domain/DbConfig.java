@@ -1,6 +1,6 @@
 package io.dbflow.domain;
 
-import java.time.OffsetDateTime;
+import io.dbflow.common.DateTimeHelper;
 
 public class DbConfig {
     private Long dbConfigId;
@@ -16,8 +16,6 @@ public class DbConfig {
     private String createdAt;
     private String updatedAt;
 
-    String now = OffsetDateTime.now().toString();
-
     public DbConfig() {}
 
     public DbConfig(String dbAlias, String dbType, String dbHost, Integer dbPort, String dbName, String dbSchema, String dbUser, String dbPassword) {
@@ -30,6 +28,7 @@ public class DbConfig {
         this.dbUser = dbUser;
         this.dbPassword = dbPassword;
         this.useYn = 1;
+        String now = DateTimeHelper.now();
         this.createdAt = now;
         this.updatedAt = now;
     }
@@ -45,13 +44,14 @@ public class DbConfig {
         this.dbUser = dbUser;
         this.dbPassword = dbPassword;
         this.useYn = useYn;
+        String now = DateTimeHelper.now();
         this.createdAt = now;
         this.updatedAt = now;
     }
 
     public DbConfig(String dbAlias) {
         this.dbAlias = dbAlias;
-        this.updatedAt = now;
+        this.updatedAt = DateTimeHelper.now();
     }
 
     public Long getDbConfigId() {

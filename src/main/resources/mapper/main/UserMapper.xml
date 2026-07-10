@@ -37,14 +37,14 @@
     <update id="updateCurrentDbConfigId" parameterType="io.dbflow.domain.User">
         UPDATE DBF_USER
            SET DB_CONFIG_ID = #{dbConfigId,jdbcType=INTEGER}
-             , UPDATED_AT = DATETIME('NOW')
+             , UPDATED_AT = datetime('now', 'localtime')
          WHERE USER_ID = #{userId,jdbcType=VARCHAR}
     </update>
 
     <update id="updateDelDbConfigId" parameterType="io.dbflow.domain.User">
         UPDATE DBF_USER
            SET DB_CONFIG_ID = NULL
-             , UPDATED_AT = DATETIME('NOW')
+             , UPDATED_AT = datetime('now', 'localtime')
          WHERE USER_ID = #{userId,jdbcType=VARCHAR}
     </update>
 

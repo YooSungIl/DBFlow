@@ -1,8 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.DbConnectionException;
-import io.dbflow.common.Exception.UserException;
-import io.dbflow.common.Exception.WorkException;
+import io.dbflow.common.Exception.ServiceException;
 import io.dbflow.domain.*;
 import io.dbflow.infrastructure.repository.DbConfigRepository;
 import io.dbflow.infrastructure.repository.UserRepository;
@@ -20,13 +18,13 @@ public class WorkService {
         User user = userRepository.findActiveUser();
 
         if (user == null) {
-            throw new UserException("등록된 사용자 정보가 없습니다.");
+            throw new ServiceException(ServiceException.USER_NOT_FOUND);
         }
 
         DbConfig dbConfig = dbConfigRepository.findDbConfig(alias);
 
         if (dbConfig == null) {
-            throw new DbConnectionException("등록된 DB 접속정보가 없습니다.");
+            throw new ServiceException(ServiceException.DB_CONFIG_NOT_FOUND);
         }
 
         user.setDbConfigId(dbConfig.getDbConfigId());
@@ -38,7 +36,7 @@ public class WorkService {
         Work workInfo = workRepository.findCurrentWorkInfo();
 
         if (workInfo == null) {
-            throw new WorkException("DB작업 공간 정보가 없습니다.");
+            throw new ServiceException(ServiceException.WORK_NOT_FOUND);
         }
 
         return workInfo;
@@ -48,7 +46,7 @@ public class WorkService {
         User user = userRepository.findActiveUser();
 
         if (user == null) {
-            throw new UserException("등록된 사용자 정보가 없습니다.");
+            throw new ServiceException(ServiceException.USER_NOT_FOUND);
         }
 
         userRepository.updateDelDbConfigId(user);
@@ -62,8 +60,8 @@ public class WorkService {
         return workRepository.findWorkDiff(dbConfigId);
     }
 
-    public int countWorkTarget() {
-        return workRepository.countWorkTarget();
+    public int countWorkTarget(Long dbConfigId) {
+        return workRepository.countWorkTarget(dbConfigId);
     }
 
     public List<WorkTarget> findWorkTarget(Long dbConfigId) {

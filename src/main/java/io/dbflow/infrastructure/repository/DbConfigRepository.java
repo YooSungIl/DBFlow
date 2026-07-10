@@ -18,7 +18,7 @@ public class DbConfigRepository {
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("DB접속정보 저장중 오류가 발생했습니다.", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -28,7 +28,7 @@ public class DbConfigRepository {
             DbConfigMapper dbConfigMapper = session.getMapper(DbConfigMapper.class);
             return dbConfigMapper.findDbConfigList();
         } catch (Exception e) {
-            throw new RepositoryException("DB접속정보 조회중 오류가 발생했습니다.", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -37,7 +37,7 @@ public class DbConfigRepository {
             DbConfigMapper dbConfigMapper = session.getMapper(DbConfigMapper.class);
             return dbConfigMapper.findDbConfig(dbAlias);
         } catch (Exception e) {
-            throw new RepositoryException("DB접속정보 조회중 오류가 발생했습니다.", e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
@@ -55,7 +55,7 @@ public class DbConfigRepository {
                 throw e;
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException("DB접속정보 비활성화 UPDATE 중 오류가 발생했습니다.", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }
@@ -74,7 +74,7 @@ public class DbConfigRepository {
                 throw e;
             } catch (Exception e) {
                 session.rollback();
-                throw new RepositoryException ("DB접속정보 UPDATE 중 오류가 발생했습니다.", e);
+                throw new RepositoryException(e.getMessage(), e);
             }
         }
     }

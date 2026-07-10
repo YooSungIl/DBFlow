@@ -1,5 +1,7 @@
 package io.dbflow.common.console;
 
+import com.github.freva.asciitable.AsciiTable;
+import io.dbflow.domain.DbConfig;
 import io.dbflow.dto.CommitComponentChangeView;
 import io.dbflow.dto.CommitLogView;
 import io.dbflow.dto.CommitTargetView;
@@ -37,7 +39,7 @@ public class ConsoleHelper {
     }
 
     public static void commitTargetInfo(CommitLogView commitLogView) {
-        CommitTargetView target = commitLogView.getCommitTargetViewList().get(0);
+        CommitTargetView target = firstTarget(commitLogView);
         List<CommitComponentChangeView> commitComponentChangeViewList = target.getCommitComponentChangeViews();
 
         System.out.println("Commit");
@@ -55,14 +57,14 @@ public class ConsoleHelper {
             System.out.println();
             System.out.println("Commit Components, Changes");
 
-            TablePrinter.printCommitComponentChangeList(commitComponentChangeViewList);
+            printCommitComponentChangeList(commitComponentChangeViewList);
         }
     }
 
 
     public static void commitComponentInfo(CommitLogView commitLogView) {
-        CommitTargetView target = commitLogView.getCommitTargetViewList().get(0);
-        CommitComponentChangeView component = target.getCommitComponentChangeViews().get(0);
+        CommitTargetView target = firstTarget(commitLogView);
+        CommitComponentChangeView component = firstComponentChange(target);
         List<CommitComponentChangeView> changeList = target.getCommitComponentChangeViews();
 
         System.out.println("Commit");
@@ -82,7 +84,128 @@ public class ConsoleHelper {
             System.out.println();
             System.out.println("Commit Changes");
 
-            TablePrinter.printCommitChangeList(changeList);
+            printCommitChangeList(changeList);
         }
+    }
+
+    public static void printDbConfigList(List<DbConfig> configs) {
+        String[] headers = {
+                "No", "Alias", "Type", "Host", "Port", "Database", "Schema", "Use"
+        };
+
+        String[][] data = new String[configs.size()][headers.length];
+
+        for (int i = 0; i < configs.size(); i++) {
+            DbConfig c = configs.get(i);
+
+            data[i] = new String[] {
+                    String.valueOf(i + 1),
+                    c.getDbAlias(),
+                    c.getDbType(),
+                    c.getDbHost(),
+                    String.valueOf(c.getDbPort()),
+                    c.getDbName(),
+                    c.getDbSchema(),
+                    c.getUseYn() == 1 ? "Y" : "N"
+            };
+        }
+
+        System.out.println(AsciiTable.getTable(headers, data));
+    }
+
+    public static void printCommitLogList(List<CommitLogView> commitLogs) {
+        String[] headers = {
+                "No", "Commit Id", "CreateAt", "Title"
+        };
+
+        String[][] data = new String[commitLogs.size()][headers.length];
+
+        for (int i = 0; i < commitLogs.size(); i++) {
+            CommitLogView c = commitLogs.get(i);
+
+            data[i] = new String[] {
+                    String.valueOf(i + 1),
+                    String.valueOf(c.getCommitLogId()),
+                    c.getCommitCreatedAt(),
+                    c.getCommitTitle()
+            };
+        }
+
+        System.out.println(AsciiTable.getTable(headers, data));
+    }
+
+    public static void printCommitTargetList(List<CommitTargetView> commitTargets) {
+        String[] headers = {
+                "No", "Change Type", "Object Type", "Object Name"
+        };
+
+        String[][] data = new String[commitTargets.size()][headers.length];
+
+        for (int i = 0; i < commitTargets.size(); i++) {
+            CommitTargetView t = commitTargets.get(i);
+
+            data[i] = new String[] {
+                    String.valueOf(i + 1),
+                    t.getChangeType(),
+                    t.getObjectType(),
+                    t.getObjectName()
+
+            };
+        }
+
+        System.out.println(AsciiTable.getTable(headers, data));
+    }
+
+    public static void printCommitComponentChangeList(List<CommitComponentChangeView> commitComponentChangeViews) {
+        String[] headers = {
+                "No", "Change Type", "Component Type", "Component Name", "Change Column", "Before Value", "After Value"
+        };
+
+        String[][] data = new String[commitComponentChangeViews.size()][headers.length];
+
+        for (int i = 0; i < commitComponentChangeViews.size(); i++) {
+            CommitComponentChangeView c = commitComponentChangeViews.get(i);
+
+            data[i] = new String[] {
+                    String.valueOf(i + 1),
+                    c.getChangeType(),
+                    c.getComponentType(),
+                    c.getComponentName(),
+                    c.getChangeColumn(),
+                    c.getBeforeValue(),
+                    c.getAfterValue()
+            };
+        }
+
+        System.out.println(AsciiTable.getTable(headers, data));
+    }
+
+    public static void printCommitChangeList(List<CommitComponentChangeView> commitComponentChangeViews) {
+        String[] headers = {
+                "No", "Change Column", "Before Value", "After Value"
+        };
+
+        String[][] data = new String[commitComponentChangeViews.size()][headers.length];
+
+        for (int i = 0; i < commitComponentChangeViews.size(); i++) {
+            CommitComponentChangeView c = commitComponentChangeViews.get(i);
+
+            data[i] = new String[] {
+                    String.valueOf(i + 1),
+                    c.getChangeColumn(),
+                    c.getBeforeValue(),
+                    c.getAfterValue()
+            };
+        }
+
+        System.out.println(AsciiTable.getTable(headers, data));
+    }
+
+    private static CommitTargetView firstTarget(CommitLogView commitLogView) {
+        return commitLogView.getCommitTargetViewList().get(0);
+    }
+
+    private static CommitComponentChangeView firstComponentChange(CommitTargetView target) {
+        return target.getCommitComponentChangeViews().get(0);
     }
 }

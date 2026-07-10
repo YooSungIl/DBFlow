@@ -1,5 +1,5 @@
 select t.table_catalog                    as db_name
-     , t.table_schema                     as scehma_name
+     , t.table_schema                     as schema_name
      , t.table_name                       as table_name
      , case when t.table_type = 'BASE TABLE' then 'TABLE'
             when t.table_type = 'VIEW' then 'VIEW'

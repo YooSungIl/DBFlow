@@ -2,6 +2,7 @@ package io.dbflow.command.commit;
 
 
 import io.dbflow.application.CommitService;
+import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
 import io.dbflow.common.validation.CommonValidation;
 import picocli.CommandLine.Command;
@@ -20,9 +21,15 @@ public class CommitCommand implements Runnable {
 
     @Override
     public void run() {
-        String title = PromptHelper.inputRequired("Commit title", CommonValidation::required);
-        String content = PromptHelper.inputMultiLine("Commit description");
+        try {
+            String title = PromptHelper.inputRequired("Commit title", CommonValidation::required);
+            String content = PromptHelper.inputMultiLine("Commit description");
 
-        commitService.commit(title, content);
+            commitService.commit(title, content);
+            ConsoleHelper.success("커밋이 완료되었습니다.");
+            ConsoleHelper.info("Commit title : " + title);
+        } catch (Exception e) {
+            ConsoleHelper.error(e.getMessage());
+        }
     }
 }

@@ -112,9 +112,8 @@
              , DCL.COMMIT_CONTENT
              , DCL.USER_ID
              , DCL.COMMIT_CREATED_AT
-          FROM DBF_COMMIT_LOG DCL
+         FROM DBF_COMMIT_LOG DCL
          INNER JOIN DBF_DB_CONFIG DDC ON DCL.DB_CONFIG_ID = DDC.DB_CONFIG_ID
-         WHERE DCL.DB_CONFIG_ID = #{user.dbConfigId}
          ORDER BY COMMIT_LOG_ID
          LIMIT #{limit}
     </select>
@@ -127,10 +126,9 @@
              , DCL.COMMIT_CONTENT
              , DCL.USER_ID
              , DCL.COMMIT_CREATED_AT
-          FROM DBF_COMMIT_LOG DCL
+         FROM DBF_COMMIT_LOG DCL
          INNER JOIN DBF_DB_CONFIG DDC ON DCL.DB_CONFIG_ID = DDC.DB_CONFIG_ID
-         WHERE DCL.DB_CONFIG_ID = #{user.dbConfigId}
-           AND DCL.COMMIT_LOG_ID = #{commitLogId}
+         WHERE DCL.COMMIT_LOG_ID = #{commitLogId}
     </select>
 
     <select id="selectCommitTargetList" resultType="io.dbflow.dto.CommitTargetView">

@@ -4,6 +4,7 @@ import io.dbflow.domain.Work;
 import io.dbflow.domain.WorkChange;
 import io.dbflow.domain.WorkComponent;
 import io.dbflow.domain.WorkTarget;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,6 +24,6 @@ public interface WorkMapper {
     List<WorkComponent> findWorkComponents(Long dbConfigId);
     List<WorkChange> findWorkChanges(Long dbConfigId);
 
-    int countWorkTarget();
+    int countWorkTarget(@Param("dbConfigId") Long dbConfigId);
     List<WorkTarget> findWorkTarget(Long dbConfigId);
 }

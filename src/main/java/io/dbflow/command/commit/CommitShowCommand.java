@@ -2,7 +2,6 @@ package io.dbflow.command.commit;
 
 import io.dbflow.application.CommitService;
 import io.dbflow.common.console.ConsoleHelper;
-import io.dbflow.common.console.TablePrinter;
 import io.dbflow.dto.CommitLogView;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -30,30 +29,16 @@ public class CommitShowCommand implements Runnable {
     public void run() {
         try {
             CommitService commitService = new CommitService();
-            CommitLogView commitLogView = new CommitLogView();
-
             if (objectName == null || objectName.isEmpty()) {
-                commitLogView = commitService.commitTargetList(commitLogId);
-                if (commitLogView == null) {
-                    ConsoleHelper.info("등록된 커밋 정보가 없습니다.");
-                } else {
-                    ConsoleHelper.commitLogInfo(commitLogView);
-                    TablePrinter.printCommitTargetList(commitLogView.getCommitTargetViewList());
-                }
+                CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
+                ConsoleHelper.commitLogInfo(commitLogView);
+                ConsoleHelper.printCommitTargetList(commitLogView.getCommitTargetViewList());
             } else if (componentName == null || componentName.isEmpty()) {
-                commitLogView = commitService.commitObjectDetail(commitLogId, objectName);
-                if (commitLogView.getCommitTargetViewList().isEmpty()) {
-                    ConsoleHelper.info("등록된 오브젝트 정보가 없습니다.");
-                } else {
-                    ConsoleHelper.commitTargetInfo(commitLogView);
-                }
+                CommitLogView commitLogView = commitService.commitObjectDetail(commitLogId, objectName);
+                ConsoleHelper.commitTargetInfo(commitLogView);
             } else {
-                commitLogView = commitService.commitComponentDetail(commitLogId, objectName, componentName);
-                if (commitLogView.getCommitTargetViewList().get(0).getCommitComponentChangeViews().isEmpty()) {
-                    ConsoleHelper.info("등록된 구성 요소 정보가 없습니다.");
-                } else {
-                    ConsoleHelper.commitComponentInfo(commitLogView);
-                }
+                CommitLogView commitLogView = commitService.commitComponentDetail(commitLogId, objectName, componentName);
+                ConsoleHelper.commitComponentInfo(commitLogView);
             }
         } catch (Exception e) {
             ConsoleHelper.error(e.getMessage());
