@@ -1,10 +1,10 @@
 package io.dbflow.command.user;
 
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.application.UserService;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
 import io.dbflow.common.validation.CommonValidation;
-import io.dbflow.infrastructure.repository.UserRepository;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -32,7 +32,7 @@ public class UserSetCommand implements Runnable {
                 email = PromptHelper.inputRequired("이메일", CommonValidation::validateEmail);
             }
 
-            UserService userService = new UserService(new UserRepository());
+            UserService userService = ServiceFactory.userService();
             userService.saveUserConfig(name, email);
 
             ConsoleHelper.success("사용자 정보가 저장되었습니다.");

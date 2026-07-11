@@ -1,11 +1,11 @@
 package io.dbflow.command.connect;
 
 import io.dbflow.application.ConnectService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
 import io.dbflow.common.validation.CommonValidation;
 import io.dbflow.domain.DbConfig;
-import io.dbflow.infrastructure.repository.DbConfigRepository;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Command;
 
@@ -26,7 +26,7 @@ public class ConnectEditCommand implements Runnable {
     @Override
     public void run() {
         try {
-            ConnectService connectService = new ConnectService(new DbConfigRepository());
+            ConnectService connectService = ServiceFactory.connectService();
             DbConfig beforDbConfig = connectService.findDbConfig(dbAlias);
 
             String dbAlias = PromptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, beforDbConfig.getDbAlias());

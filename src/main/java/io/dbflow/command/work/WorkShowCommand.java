@@ -1,5 +1,6 @@
 package io.dbflow.command.work;
 
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.application.WorkService;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.domain.Work;
@@ -14,7 +15,7 @@ public class WorkShowCommand implements Runnable {
     @Override
     public void run() {
         try {
-            WorkService workService = new WorkService();
+            WorkService workService = ServiceFactory.workService();
             Work work = workService.showWork();
 
             System.out.println();

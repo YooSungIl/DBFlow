@@ -12,10 +12,19 @@ import java.util.stream.Collectors;
 
 public class CompareService {
 
+    private final SnapshotService snapshotService;
+
+    public CompareService() {
+        this(new SnapshotService());
+    }
+
+    public CompareService(SnapshotService snapshotService) {
+        this.snapshotService = snapshotService;
+    }
+
     public WorkDiffResult compare(Long dbConfigId) {
         WorkDiffResult result = new WorkDiffResult();
 
-        SnapshotService snapshotService = new SnapshotService();
         SnapshotBundle snapshot = snapshotService.findSnapshotBundle(dbConfigId);
 
         compareTables(dbConfigId, snapshot, result);

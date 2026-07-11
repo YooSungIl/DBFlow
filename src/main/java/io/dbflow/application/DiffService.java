@@ -13,18 +13,40 @@ import java.util.List;
 
 public class DiffService {
 
-    public List<WorkTarget> diff() {
-        WorkService workService = new WorkService();
-        Work currentWork = workService.showWork();
+    private final WorkService workService;
+    private final ConnectService connectService;
+    private final CompareService compareService;
+    private final SnapshotService snapshotService;
 
-        ConnectService connectService = new ConnectService(new DbConfigRepository());
+    public DiffService() {
+        this(
+                new WorkService(),
+                new ConnectService(new DbConfigRepository()),
+                new CompareService(),
+                new SnapshotService()
+        );
+    }
+
+    public DiffService(
+            WorkService workService,
+            ConnectService connectService,
+            CompareService compareService,
+            SnapshotService snapshotService
+    ) {
+        this.workService = workService;
+        this.connectService = connectService;
+        this.compareService = compareService;
+        this.snapshotService = snapshotService;
+    }
+
+    public List<WorkTarget> diff() {
+        Work currentWork = workService.showWork();
         DbConfig dbConfig = connectService.findDbConfig(currentWork.getDbAlias());
 
         MetadataCollector collector = createCollector(currentWork.getDbType());
-        MetadataCollectService collectService = new MetadataCollectService(collector);
+        MetadataCollectService collectService = new MetadataCollectService(collector, snapshotService);
         collectService.collect(dbConfig);
 
-        CompareService compareService = new CompareService();
         WorkDiffResult result = compareService.compare(dbConfig.getDbConfigId());
 
         workService.diffResult(dbConfig.getDbConfigId(), result);

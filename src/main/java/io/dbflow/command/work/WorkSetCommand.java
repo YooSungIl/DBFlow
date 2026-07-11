@@ -1,5 +1,6 @@
 package io.dbflow.command.work;
 
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.application.WorkService;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
@@ -26,7 +27,7 @@ public class WorkSetCommand implements Runnable {
                 dbAlias = PromptHelper.inputRequired("DB별칭", CommonValidation::required);
             }
 
-            WorkService workService = new WorkService();
+            WorkService workService = ServiceFactory.workService();
             workService.setWork(dbAlias);
 
             ConsoleHelper.success("DB작업 공간이 " + "'" + dbAlias + "'으로 변경 되었습니다.");

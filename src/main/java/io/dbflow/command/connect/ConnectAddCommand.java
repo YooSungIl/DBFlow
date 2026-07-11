@@ -1,13 +1,12 @@
 package io.dbflow.command.connect;
 
 import io.dbflow.application.ConnectService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.application.UserService;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
 import io.dbflow.common.validation.CommonValidation;
 import io.dbflow.domain.DbConfig;
-import io.dbflow.infrastructure.repository.DbConfigRepository;
-import io.dbflow.infrastructure.repository.UserRepository;
 import picocli.CommandLine.Command;
 
 import java.util.List;
@@ -22,10 +21,10 @@ public class ConnectAddCommand implements Runnable {
     public void run() {
 
         try {
-            UserService userService = new UserService(new UserRepository());
+            UserService userService = ServiceFactory.userService();
             userService.checkUserExists();
 
-            ConnectService connectService = new ConnectService(new DbConfigRepository());
+            ConnectService connectService = ServiceFactory.connectService();
 
             String dbAlias = PromptHelper.inputRequired("DB별칭", connectService::validateNewAlias);
             String dbType = PromptHelper.inputSelect("지원하는 DBMS종류를 선택해 주세요.", List.of("POSTGRESQL"));

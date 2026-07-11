@@ -1,6 +1,7 @@
 package io.dbflow.command.diff;
 
 import io.dbflow.application.DiffService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.common.console.WorkDiffPrinter;
 import io.dbflow.domain.WorkTarget;
 import picocli.CommandLine.Command;
@@ -15,7 +16,7 @@ public class DiffCommand implements Runnable {
 
     @Override
     public void run() {
-        DiffService diffService = new DiffService();
+        DiffService diffService = ServiceFactory.diffService();
         List<WorkTarget> targets = diffService.diff();
 
         WorkDiffPrinter.print(targets);

@@ -8,7 +8,15 @@ import java.util.List;
 
 public class SnapshotService {
 
-    private final SnapshotRepository snapshotRepository = new SnapshotRepository();
+    private final SnapshotRepository snapshotRepository;
+
+    public SnapshotService() {
+        this(new SnapshotRepository());
+    }
+
+    public SnapshotService(SnapshotRepository snapshotRepository) {
+        this.snapshotRepository = snapshotRepository;
+    }
 
     public void insertTableSnapshotList(Long dbConfigId, List<TableMetadata> tableMetadataList) {
         snapshotRepository.insertTableSnapshotList(dbConfigId, tableMetadataList);

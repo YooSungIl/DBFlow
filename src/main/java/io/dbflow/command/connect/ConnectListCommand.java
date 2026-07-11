@@ -1,9 +1,9 @@
 package io.dbflow.command.connect;
 
 import io.dbflow.application.ConnectService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.domain.DbConfig;
-import io.dbflow.infrastructure.repository.DbConfigRepository;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class ConnectListCommand implements Runnable {
     @Override
     public void run() {
         try {
-            ConnectService connectService = new ConnectService(new DbConfigRepository());
+            ConnectService connectService = ServiceFactory.connectService();
             List<DbConfig> dbConfig = connectService.findDbConfigList();
 
             if (dbConfig == null) {

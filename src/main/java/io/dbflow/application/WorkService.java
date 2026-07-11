@@ -9,9 +9,23 @@ import io.dbflow.infrastructure.repository.WorkRepository;
 import java.util.List;
 
 public class WorkService {
-    private final DbConfigRepository dbConfigRepository = new DbConfigRepository();
-    private final UserRepository userRepository = new UserRepository();
-    private final WorkRepository workRepository = new WorkRepository();
+    private final DbConfigRepository dbConfigRepository;
+    private final UserRepository userRepository;
+    private final WorkRepository workRepository;
+
+    public WorkService() {
+        this(new DbConfigRepository(), new UserRepository(), new WorkRepository());
+    }
+
+    public WorkService(
+            DbConfigRepository dbConfigRepository,
+            UserRepository userRepository,
+            WorkRepository workRepository
+    ) {
+        this.dbConfigRepository = dbConfigRepository;
+        this.userRepository = userRepository;
+        this.workRepository = workRepository;
+    }
 
     public void setWork(String alias) {
 

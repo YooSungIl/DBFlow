@@ -12,12 +12,16 @@ import java.util.stream.Collectors;
 
 public class MetadataCollectService {
     private final MetadataCollector metadataCollector;
+    private final SnapshotService snapshotService;
 
     public MetadataCollectService(MetadataCollector metadataCollector) {
-        this.metadataCollector = metadataCollector;
+        this(metadataCollector, new SnapshotService());
     }
 
-    SnapshotService snapshotService = new SnapshotService();
+    public MetadataCollectService(MetadataCollector metadataCollector, SnapshotService snapshotService) {
+        this.metadataCollector = metadataCollector;
+        this.snapshotService = snapshotService;
+    }
 
     public void collect(DbConfig dbConfig) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {

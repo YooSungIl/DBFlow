@@ -2,6 +2,7 @@ package io.dbflow.command.commit;
 
 
 import io.dbflow.application.CommitService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.common.console.PromptHelper;
 import io.dbflow.common.validation.CommonValidation;
@@ -17,7 +18,7 @@ import picocli.CommandLine.Command;
 )
 public class CommitCommand implements Runnable {
 
-    private final CommitService commitService = new CommitService();
+    private final CommitService commitService = ServiceFactory.commitService();
 
     @Override
     public void run() {

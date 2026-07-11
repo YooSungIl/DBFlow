@@ -1,6 +1,7 @@
 package io.dbflow.command.commit;
 
 import io.dbflow.application.CommitService;
+import io.dbflow.application.ServiceFactory;
 import io.dbflow.common.console.ConsoleHelper;
 import io.dbflow.dto.CommitLogView;
 import picocli.CommandLine.Command;
@@ -28,7 +29,7 @@ public class CommitShowCommand implements Runnable {
     @Override
     public void run() {
         try {
-            CommitService commitService = new CommitService();
+            CommitService commitService = ServiceFactory.commitService();
             if (objectName == null || objectName.isEmpty()) {
                 CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
                 ConsoleHelper.commitLogInfo(commitLogView);

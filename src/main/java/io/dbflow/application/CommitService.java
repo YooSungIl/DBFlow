@@ -15,22 +15,43 @@ import java.util.List;
 
 public class CommitService {
 
-    private final CommitRepository commitRepository = new CommitRepository();
-    private final SnapshotRepository snapshotRepository = new SnapshotRepository();
+    private final CommitRepository commitRepository;
+    private final SnapshotRepository snapshotRepository;
+    private final UserService userService;
+    private final WorkService workService;
+
+    public CommitService() {
+        this(
+                new CommitRepository(),
+                new SnapshotRepository(),
+                new UserService(new UserRepository()),
+                new WorkService()
+        );
+    }
+
+    public CommitService(
+            CommitRepository commitRepository,
+            SnapshotRepository snapshotRepository,
+            UserService userService,
+            WorkService workService
+    ) {
+        this.commitRepository = commitRepository;
+        this.snapshotRepository = snapshotRepository;
+        this.userService = userService;
+        this.workService = workService;
+    }
 
     public void commit(String title, String content) {
         if (title == null || title.isBlank()) {
             throw new ServiceException(ServiceException.COMMIT_TITLE_REQUIRED);
         }
 
-        UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
 
         if (user == null) {
             throw new ServiceException(ServiceException.USER_NOT_FOUND);
         }
 
-        WorkService workService = new WorkService();
         int workCount = workService.countWorkTarget(user.getDbConfigId());
 
         if (workCount == 0) {
@@ -59,28 +80,24 @@ public class CommitService {
     }
 
     public List<CommitLogView> commitLogList(int limit) {
-        UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
 
         return commitRepository.selectCommitLogList(user, limit);
     }
 
     public CommitLogView commitTargetList(Long commitLogId) {
-        UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
 
         return commitRepository.selectCommitTargetList(user, commitLogId);
     }
 
     public CommitLogView commitObjectDetail(Long commitLogId, String objectName) {
-        UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
 
         return commitRepository.selectCommitObjectDetail(user, commitLogId, objectName);
     }
 
     public CommitLogView commitComponentDetail(Long commitLogId, String objectName, String componentName) {
-        UserService userService = new UserService(new UserRepository());
         User user = userService.findActiveUser();
 
         return commitRepository.selectCommitComponentDetail(user, commitLogId, objectName, componentName);
