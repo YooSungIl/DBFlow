@@ -19,20 +19,26 @@ import picocli.CommandLine.Command;
 public class CommitCommand implements Runnable {
 
     private final CommitService commitService;
+    private final PromptHelper promptHelper;
 
     public CommitCommand() {
-        this(ServiceFactory.commitService());
+        this(ServiceFactory.commitService(), new PromptHelper());
     }
 
     public CommitCommand(CommitService commitService) {
+        this(commitService, new PromptHelper());
+    }
+
+    public CommitCommand(CommitService commitService, PromptHelper promptHelper) {
         this.commitService = commitService;
+        this.promptHelper = promptHelper;
     }
 
     @Override
     public void run() {
         try {
-            String title = PromptHelper.inputRequired("Commit title", CommonValidation::required);
-            String content = PromptHelper.inputMultiLine("Commit description");
+            String title = promptHelper.inputRequired("Commit title", CommonValidation::required);
+            String content = promptHelper.inputMultiLine("Commit description");
 
             commitService.commit(title, content);
             ConsoleHelper.success("커밋이 완료되었습니다.");

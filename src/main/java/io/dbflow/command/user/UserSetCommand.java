@@ -15,13 +15,19 @@ import picocli.CommandLine.Option;
 public class UserSetCommand implements Runnable {
 
     private final UserService userService;
+    private final PromptHelper promptHelper;
 
     public UserSetCommand() {
-        this(ServiceFactory.userService());
+        this(ServiceFactory.userService(), new PromptHelper());
     }
 
     public UserSetCommand(UserService userService) {
+        this(userService, new PromptHelper());
+    }
+
+    public UserSetCommand(UserService userService, PromptHelper promptHelper) {
         this.userService = userService;
+        this.promptHelper = promptHelper;
     }
 
 
@@ -36,11 +42,11 @@ public class UserSetCommand implements Runnable {
 
         try {
             if (name == null || name.isBlank()) {
-                name = PromptHelper.inputRequired("사용자명", CommonValidation::required);
+                name = promptHelper.inputRequired("사용자명", CommonValidation::required);
             }
 
             if (email == null || email.isBlank()) {
-                email = PromptHelper.inputRequired("이메일", CommonValidation::validateEmail);
+                email = promptHelper.inputRequired("이메일", CommonValidation::validateEmail);
             }
 
             userService.saveUserConfig(name, email);

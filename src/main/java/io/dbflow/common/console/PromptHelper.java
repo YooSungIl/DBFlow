@@ -2,24 +2,33 @@ package io.dbflow.common.console;
 
 import io.dbflow.common.Exception.ValidationException;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class PromptHelper {
-    private static final Scanner SCANNER = new Scanner(System.in);
+    private final Scanner scanner;
 
-    public static String input(String label) {
+    public PromptHelper() {
+        this(System.in);
+    }
+
+    public PromptHelper(InputStream inputStream) {
+        this.scanner = new Scanner(inputStream);
+    }
+
+    public String input(String label) {
         System.out.print(label + ": ");
-        return SCANNER.nextLine().trim();
+        return scanner.nextLine().trim();
     }
 
-    public static String editInput(String label, String defaultValue) {
+    public String editInput(String label, String defaultValue) {
         System.out.print(label + " [" + defaultValue + "] : ");
-        return SCANNER.nextLine().trim();
+        return scanner.nextLine().trim();
     }
 
-    public static String inputRequired(String label, Consumer<String> validator) {
+    public String inputRequired(String label, Consumer<String> validator) {
         while (true) {
             try {
                 String value = input(label);
@@ -31,7 +40,7 @@ public class PromptHelper {
         }
     }
 
-    public static Integer inputRequiredInt(String label, Consumer<Integer> validator) {
+    public Integer inputRequiredInt(String label, Consumer<Integer> validator) {
         while (true) {
             try {
                 String input = input(label);
@@ -46,7 +55,7 @@ public class PromptHelper {
         }
     }
 
-    public static String inputSelect(String title, List<String> options) {
+    public String inputSelect(String title, List<String> options) {
         System.out.println(title);
 
         for (int i = 0; i < options.size(); i++) {
@@ -55,7 +64,7 @@ public class PromptHelper {
 
         while (true) {
             System.out.print("선택: ");
-            String input = SCANNER.nextLine().trim();
+            String input = scanner.nextLine().trim();
 
             try {
                 int index = Integer.parseInt(input) - 1;
@@ -70,7 +79,7 @@ public class PromptHelper {
         }
     }
 
-    public static String inputEdit(String label, Consumer<String> validator, String defaultValue) {
+    public String inputEdit(String label, Consumer<String> validator, String defaultValue) {
         while (true) {
             try {
                 String value = editInput(label, defaultValue);
@@ -87,7 +96,7 @@ public class PromptHelper {
         }
     }
 
-    public static Integer inputEditInt(String label, Consumer<Integer> validator, Integer defaultValue) {
+    public Integer inputEditInt(String label, Consumer<Integer> validator, Integer defaultValue) {
         while (true) {
             try {
                 String input = editInput(label, defaultValue.toString());
@@ -109,14 +118,14 @@ public class PromptHelper {
      * 여러 줄 입력
      * 빈 줄을 두 번 입력하면 종료
      */
-    public static String inputMultiLine(String title) {
+    public String inputMultiLine(String title) {
         System.out.println();
         System.out.println(title + "(빈 줄을 두 번 입력하면 종료됩니다.)");
         StringBuilder sb = new StringBuilder();
         boolean previousBlank = false;
         while (true) {
             System.out.print("> ");
-            String line = SCANNER.nextLine();
+            String line = scanner.nextLine();
             if (line.isBlank()) {
                 if (previousBlank) {
                     break;

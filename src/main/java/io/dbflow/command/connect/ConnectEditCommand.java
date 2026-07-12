@@ -18,13 +18,19 @@ import java.util.List;
 public class ConnectEditCommand implements Runnable {
 
     private final ConnectService connectService;
+    private final PromptHelper promptHelper;
 
     public ConnectEditCommand() {
-        this(ServiceFactory.connectService());
+        this(ServiceFactory.connectService(), new PromptHelper());
     }
 
     public ConnectEditCommand(ConnectService connectService) {
+        this(connectService, new PromptHelper());
+    }
+
+    public ConnectEditCommand(ConnectService connectService, PromptHelper promptHelper) {
         this.connectService = connectService;
+        this.promptHelper = promptHelper;
     }
 
     @Parameters(
@@ -38,15 +44,15 @@ public class ConnectEditCommand implements Runnable {
         try {
             DbConfig beforDbConfig = connectService.findDbConfig(dbAlias);
 
-            String dbAlias = PromptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, beforDbConfig.getDbAlias());
-            String dbType = PromptHelper.inputSelect("DB 종류", List.of("POSTGRESQL"));
-            String dbHost = PromptHelper.inputEdit("Host", CommonValidation::required, beforDbConfig.getDbHost());
-            Integer dbPort = PromptHelper.inputEditInt("Port", CommonValidation::validatePort, beforDbConfig.getDbPort());
-            String dbName = PromptHelper.inputEdit("DB Name", CommonValidation::required, beforDbConfig.getDbName());
-            String dbSchema = PromptHelper.inputEdit("DB Schema", CommonValidation::required, beforDbConfig.getDbSchema());
-            String dbUser = PromptHelper.inputEdit("DB User", CommonValidation::required, beforDbConfig.getDbUser());
-            String dbPassword = PromptHelper.inputEdit("DB Password", CommonValidation::required, beforDbConfig.getDbPassword());
-            Integer useYn = PromptHelper.inputEditInt("DB useYn", CommonValidation::requiredInt, beforDbConfig.getUseYn());
+            String dbAlias = promptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, beforDbConfig.getDbAlias());
+            String dbType = promptHelper.inputSelect("DB 종류", List.of("POSTGRESQL"));
+            String dbHost = promptHelper.inputEdit("Host", CommonValidation::required, beforDbConfig.getDbHost());
+            Integer dbPort = promptHelper.inputEditInt("Port", CommonValidation::validatePort, beforDbConfig.getDbPort());
+            String dbName = promptHelper.inputEdit("DB Name", CommonValidation::required, beforDbConfig.getDbName());
+            String dbSchema = promptHelper.inputEdit("DB Schema", CommonValidation::required, beforDbConfig.getDbSchema());
+            String dbUser = promptHelper.inputEdit("DB User", CommonValidation::required, beforDbConfig.getDbUser());
+            String dbPassword = promptHelper.inputEdit("DB Password", CommonValidation::required, beforDbConfig.getDbPassword());
+            Integer useYn = promptHelper.inputEditInt("DB useYn", CommonValidation::requiredInt, beforDbConfig.getUseYn());
 
             DbConfig dbConfig = new DbConfig(beforDbConfig.getDbConfigId(), dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword, useYn);
 

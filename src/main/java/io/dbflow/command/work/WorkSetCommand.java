@@ -15,13 +15,19 @@ import picocli.CommandLine.Parameters;
 public class WorkSetCommand implements Runnable {
 
     private final WorkService workService;
+    private final PromptHelper promptHelper;
 
     public WorkSetCommand() {
-        this(ServiceFactory.workService());
+        this(ServiceFactory.workService(), new PromptHelper());
     }
 
     public WorkSetCommand(WorkService workService) {
+        this(workService, new PromptHelper());
+    }
+
+    public WorkSetCommand(WorkService workService, PromptHelper promptHelper) {
         this.workService = workService;
+        this.promptHelper = promptHelper;
     }
 
     @Parameters(
@@ -34,7 +40,7 @@ public class WorkSetCommand implements Runnable {
     public void run() {
         try {
             if (dbAlias == null || dbAlias.isBlank()) {
-                dbAlias = PromptHelper.inputRequired("DB별칭", CommonValidation::required);
+                dbAlias = promptHelper.inputRequired("DB별칭", CommonValidation::required);
             }
 
             workService.setWork(dbAlias);
