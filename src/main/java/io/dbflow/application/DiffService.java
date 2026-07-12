@@ -43,8 +43,7 @@ public class DiffService {
         Work currentWork = workService.showWork();
         DbConfig dbConfig = connectService.findDbConfig(currentWork.getDbAlias());
 
-        MetadataCollector collector = createCollector(currentWork.getDbType());
-        MetadataCollectService collectService = new MetadataCollectService(collector, snapshotService);
+        MetadataCollectService collectService = createMetadataCollectService(currentWork.getDbType());
         collectService.collect(dbConfig);
 
         WorkDiffResult result = compareService.compare(dbConfig.getDbConfigId());
@@ -52,6 +51,11 @@ public class DiffService {
         workService.diffResult(dbConfig.getDbConfigId(), result);
 
         return workService.findWorkDiff(dbConfig.getDbConfigId());
+    }
+
+    protected MetadataCollectService createMetadataCollectService(String dbType) {
+        MetadataCollector collector = createCollector(dbType);
+        return new MetadataCollectService(collector, snapshotService);
     }
 
     private MetadataCollector createCollector(String dbType) {

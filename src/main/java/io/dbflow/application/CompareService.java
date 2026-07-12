@@ -168,7 +168,7 @@ public class CompareService {
             return target;
         }
 
-        target = new WorkTarget(null, ObjectType.TABLE.name(), table.getTableName(), table.getTableComment(), ChangeType.MOD.name());
+        target = new WorkTarget(table.getDbConfigId(), ObjectType.TABLE.name(), table.getTableName(), table.getTableComment(), ChangeType.MOD.name());
         result.addTarget(target);
         targetMap.put(table.getTableName(), target);
 
