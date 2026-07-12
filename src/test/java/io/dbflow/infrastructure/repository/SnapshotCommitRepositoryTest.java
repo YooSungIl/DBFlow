@@ -1,6 +1,14 @@
 package io.dbflow.infrastructure.repository;
 
 import io.dbflow.application.MetadataCollectService;
+import io.dbflow.application.CommitService;
+import io.dbflow.application.UserService;
+import io.dbflow.application.WorkService;
+import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.domain.WorkChange;
+import io.dbflow.domain.WorkComponent;
+import io.dbflow.domain.WorkDiffResult;
+import io.dbflow.domain.WorkTarget;
 import io.dbflow.domain.TableSnapshot;
 import io.dbflow.domain.ColumnMetadata;
 import io.dbflow.domain.CommitLog;
@@ -191,6 +199,78 @@ class SnapshotCommitRepositoryTest {
         assertEquals(0, count("DBF_CURRENT_TABLE_SNAPSHOT", "DB_CONFIG_ID = " + dbConfigId + " AND TABLE_NAME = 'B'"));
         assertEquals(1, count("DBF_CURRENT_TABLE_SNAPSHOT", "DB_CONFIG_ID = " + dbConfigId + " AND TABLE_NAME = 'C'"));
         assertEquals(0, count("DBF_CURRENT_COLUMN_SNAPSHOT", "COLUMN_NAME = 'B_column'"));
+    }
+
+    @Test
+    void commitServiceCommitsWorkAndSnapshotsInOneTransaction() throws Exception {
+        Long dbConfigId = insertDbConfig("db1");
+        insertUser(dbConfigId);
+        insertWorkTree(dbConfigId, "member", "member_id");
+        Long collectTableId = insertCollectTable(dbConfigId, "member");
+        insertCollectColumn(collectTableId, "member_id");
+
+        CommitService commitService = new CommitService(
+                new CommitRepository(),
+                new SnapshotRepository(),
+                new UserService(new UserRepository()),
+                new WorkService()
+        );
+
+        commitService.commit("통합 테스트", "Commit 전체 흐름");
+
+        assertEquals(1, count("DBF_COMMIT_LOG", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(1, count("DBF_COMMIT_TARGET", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(1, count("DBF_HISTORY_TABLE_SNAPSHOT", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(1, count("DBF_HISTORY_COLUMN_SNAPSHOT", "1 = 1"));
+        assertEquals(1, count("DBF_CURRENT_TABLE_SNAPSHOT", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(1, count("DBF_CURRENT_COLUMN_SNAPSHOT", "1 = 1"));
+    }
+
+    @Test
+    void commitServiceRollsBackEverythingWhenSnapshotSaveFails() throws Exception {
+        Long dbConfigId = insertDbConfig("db1");
+        insertUser(dbConfigId);
+        insertWorkTree(dbConfigId, "member", "member_id");
+
+        CommitService commitService = new CommitService(
+                new CommitRepository(),
+                new FailingSnapshotRepository(),
+                new UserService(new UserRepository()),
+                new WorkService()
+        );
+
+        assertThrows(ServiceException.class, () -> commitService.commit("실패 테스트", "Rollback 확인"));
+
+        assertEquals(0, count("DBF_COMMIT_LOG", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(0, count("DBF_COMMIT_TARGET", "DB_CONFIG_ID = " + dbConfigId));
+        assertEquals(0, count("DBF_COMMIT_COMPONENT", "1 = 1"));
+        assertEquals(0, count("DBF_COMMIT_CHANGE", "1 = 1"));
+        assertEquals(1, count("DBF_WORK_TARGET", "DB_CONFIG_ID = " + dbConfigId));
+    }
+
+    @Test
+    void workRepositoryReplacesAndAssemblesOnlyRequestedDbConfigDiff() throws Exception {
+        Long dbConfigId = insertDbConfig("db1");
+        Long otherDbConfigId = insertDbConfig("db2");
+        insertWorkTree(otherDbConfigId, "other_table", "other_column");
+
+        WorkDiffResult result = new WorkDiffResult();
+        WorkTarget target = result.addTarget(new WorkTarget(null, "TABLE", "member", "회원", "MOD"));
+        WorkComponent component = target.addComponent(new WorkComponent("COLUMN", "member_id", "회원 ID", "MOD"));
+        component.addChange(new WorkChange("DATA_TYPE", "integer", "bigint"));
+
+        WorkRepository workRepository = new WorkRepository();
+        workRepository.replace(dbConfigId, result);
+        List<WorkTarget> storedTargets = workRepository.findWorkDiff(dbConfigId);
+
+        assertEquals(1, storedTargets.size());
+        assertEquals(dbConfigId, storedTargets.get(0).getDbConfigId());
+        assertEquals("member", storedTargets.get(0).getObjectName());
+        assertEquals(1, storedTargets.get(0).getComponents().size());
+        assertEquals("member_id", storedTargets.get(0).getComponents().get(0).getComponentName());
+        assertEquals(1, storedTargets.get(0).getComponents().get(0).getChanges().size());
+        assertEquals("DATA_TYPE", storedTargets.get(0).getComponents().get(0).getChanges().get(0).getChangeColumn());
+        assertEquals(1, count("DBF_WORK_TARGET", "DB_CONFIG_ID = " + otherDbConfigId));
     }
 
     private static void dropTables(Statement statement) throws Exception {
@@ -420,6 +500,13 @@ class SnapshotCommitRepositoryTest {
         @Override
         public List<ColumnMetadata> collectColumnSnapshotList(DbConfig dbConfig, List<TableSnapshot> tableSnapshot) {
             throw new IllegalStateException("column collect failed");
+        }
+    }
+
+    private static class FailingSnapshotRepository extends SnapshotRepository {
+        @Override
+        public void insertCommitHistorySnapshot(CommitLog commitLog, SqlSession session) {
+            throw new IllegalStateException("history snapshot save failed");
         }
     }
 }
