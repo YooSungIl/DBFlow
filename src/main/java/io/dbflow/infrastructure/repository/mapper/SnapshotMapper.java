@@ -7,16 +7,16 @@ import java.util.List;
 
 public interface SnapshotMapper {
     void insertTableSnapshotList(@Param("dbConfigId") Long DbConfigId, @Param("list") List<TableMetadata> tableMetadata);
-    void insertColumnSnapshotList(@Param("list") List<CollectColumnSnapshot> columnSnapshotList);
+    void insertColumnSnapshotList(@Param("list") List<ColumnSnapshot> columnSnapshotList);
 
-    List<CollectTableSnapshot> selectCollectTableSnapshot(@Param("dbConfigId") Long dbConfigId);
-    List<CollectColumnSnapshot> selectCollectColumnSnapshot(@Param("dbConfigId") Long dbConfigId);
+    List<TableSnapshot> selectCollectTableSnapshot(@Param("dbConfigId") Long dbConfigId);
+    List<ColumnSnapshot> selectCollectColumnSnapshot(@Param("dbConfigId") Long dbConfigId);
 
     void deleteCollectTableSnapshot(@Param("dbConfigId") Long dbConfigId);
     void deleteCollectColumnSnapshot(@Param("dbConfigId") Long dbConfigId);
 
-    List<CurrentTableSnapshot> selectCurrentTableSnapshot(@Param("dbConfigId") Long dbConfigId);
-    List<CurrentColumnSnapshot> selectCurrentColumnSnapshot(@Param("dbConfigId") Long dbConfigId);
+    List<TableSnapshot> selectCurrentTableSnapshot(@Param("dbConfigId") Long dbConfigId);
+    List<ColumnSnapshot> selectCurrentColumnSnapshot(@Param("dbConfigId") Long dbConfigId);
 
     void deleteCommitCurrentTableSnapshot(@Param("commitLogId") Long commitLogId, @Param("dbConfigId") Long dbConfigId);
     void deleteCommitCurrentColumnSnapshot(@Param("commitLogId") Long commitLogId, @Param("dbConfigId") Long dbConfigId);

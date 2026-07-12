@@ -27,10 +27,10 @@ public class SnapshotRepository {
         snapshotMapper.insertTableSnapshotList(dbConfigId, tableMetadata);
     }
 
-    public void insertColumnSnapshotList(List<CollectColumnSnapshot> collectColumnSnapshotList) {
+    public void insertColumnSnapshotList(List<ColumnSnapshot> columnSnapshotList) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {
             try {
-                insertColumnSnapshotList(collectColumnSnapshotList, session);
+                insertColumnSnapshotList(columnSnapshotList, session);
                 session.commit();
             } catch (Exception e) {
                 session.rollback();
@@ -39,12 +39,12 @@ public class SnapshotRepository {
         }
     }
 
-    public void insertColumnSnapshotList(List<CollectColumnSnapshot> collectColumnSnapshotList, SqlSession session) {
+    public void insertColumnSnapshotList(List<ColumnSnapshot> columnSnapshotList, SqlSession session) {
         SnapshotMapper snapshotMapper = session.getMapper(SnapshotMapper.class);
-        snapshotMapper.insertColumnSnapshotList(collectColumnSnapshotList);
+        snapshotMapper.insertColumnSnapshotList(columnSnapshotList);
     }
 
-    public List<CollectTableSnapshot> selectCollectTableSnapshot(Long dbConfigId) {
+    public List<TableSnapshot> selectCollectTableSnapshot(Long dbConfigId) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             return selectCollectTableSnapshot(dbConfigId, session);
         } catch (Exception e) {
@@ -52,12 +52,12 @@ public class SnapshotRepository {
         }
     }
 
-    public List<CollectTableSnapshot> selectCollectTableSnapshot(Long dbConfigId, SqlSession session) {
+    public List<TableSnapshot> selectCollectTableSnapshot(Long dbConfigId, SqlSession session) {
         SnapshotMapper snapshotMapper = session.getMapper(SnapshotMapper.class);
         return snapshotMapper.selectCollectTableSnapshot(dbConfigId);
     }
 
-    public List<CollectColumnSnapshot> selectCollectColumnSnapshot(Long dbConfigId) {
+    public List<ColumnSnapshot> selectCollectColumnSnapshot(Long dbConfigId) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             SnapshotMapper snapshotMapper = session.getMapper(SnapshotMapper.class);
             return snapshotMapper.selectCollectColumnSnapshot(dbConfigId);
@@ -84,7 +84,7 @@ public class SnapshotRepository {
         snapshotMapper.deleteCollectTableSnapshot(dbConfigId);
     }
 
-    public List<CurrentTableSnapshot> selectCurrentTableSnapshot(Long dbConfigId) {
+    public List<TableSnapshot> selectCurrentTableSnapshot(Long dbConfigId) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             SnapshotMapper snapshotMapper = session.getMapper(SnapshotMapper.class);
             return snapshotMapper.selectCurrentTableSnapshot(dbConfigId);
@@ -93,7 +93,7 @@ public class SnapshotRepository {
         }
     }
 
-    public List<CurrentColumnSnapshot> selectCurrentColumnSnapshot(Long dbConfigId) {
+    public List<ColumnSnapshot> selectCurrentColumnSnapshot(Long dbConfigId) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             SnapshotMapper snapshotMapper = session.getMapper(SnapshotMapper.class);
             return snapshotMapper.selectCurrentColumnSnapshot(dbConfigId);

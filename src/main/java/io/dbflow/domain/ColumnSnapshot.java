@@ -1,13 +1,8 @@
 package io.dbflow.domain;
 
-public class CurrentColumnSnapshot {
-    private Long currentColumnId;
-    private Long currentTableId;
-
-    private String tableName;
-    private String tableComment;
-    private String tableType;
-
+public class ColumnSnapshot {
+    private Long columnSnapshotId;
+    private Long tableSnapshotId;
     private String columnName;
     private String columnComment;
     private Integer columnOrder;
@@ -19,44 +14,20 @@ public class CurrentColumnSnapshot {
     private Integer identityYn;
     private String identityType;
 
-    public Long getCurrentColumnId() {
-        return currentColumnId;
+    public Long getColumnSnapshotId() {
+        return columnSnapshotId;
     }
 
-    public void setCurrentColumnId(Long currentColumnId) {
-        this.currentColumnId = currentColumnId;
+    public void setColumnSnapshotId(Long columnSnapshotId) {
+        this.columnSnapshotId = columnSnapshotId;
     }
 
-    public Long getCurrentTableId() {
-        return currentTableId;
+    public Long getTableSnapshotId() {
+        return tableSnapshotId;
     }
 
-    public void setCurrentTableId(Long currentTableId) {
-        this.currentTableId = currentTableId;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public String getTableComment() {
-        return tableComment;
-    }
-
-    public void setTableComment(String tableComment) {
-        this.tableComment = tableComment;
-    }
-
-    public String getTableType() {
-        return tableType;
-    }
-
-    public void setTableType(String tableType) {
-        this.tableType = tableType;
+    public void setTableSnapshotId(Long tableSnapshotId) {
+        this.tableSnapshotId = tableSnapshotId;
     }
 
     public String getColumnName() {

@@ -1,6 +1,7 @@
 package io.dbflow.application;
 
 import io.dbflow.domain.*;
+import io.dbflow.common.enums.SnapshotType;
 import io.dbflow.infrastructure.repository.SnapshotRepository;
 import org.apache.ibatis.session.SqlSession;
 
@@ -26,23 +27,23 @@ public class SnapshotService {
         snapshotRepository.insertTableSnapshotList(dbConfigId, tableMetadataList, session);
     }
 
-    public void insertColumnSnapshotList(List<CollectColumnSnapshot> collectColumnSnapshotList) {
-        snapshotRepository.insertColumnSnapshotList(collectColumnSnapshotList);
+    public void insertColumnSnapshotList(List<ColumnSnapshot> columnSnapshotList) {
+        snapshotRepository.insertColumnSnapshotList(columnSnapshotList);
     }
 
-    public void insertColumnSnapshotList(List<CollectColumnSnapshot> collectColumnSnapshotList, SqlSession session) {
-        snapshotRepository.insertColumnSnapshotList(collectColumnSnapshotList, session);
+    public void insertColumnSnapshotList(List<ColumnSnapshot> columnSnapshotList, SqlSession session) {
+        snapshotRepository.insertColumnSnapshotList(columnSnapshotList, session);
     }
 
-    public List<CollectTableSnapshot> selectCollectTableSnapshot(Long dbConfigId) {
+    public List<TableSnapshot> selectCollectTableSnapshot(Long dbConfigId) {
         return snapshotRepository.selectCollectTableSnapshot(dbConfigId);
     }
 
-    public List<CollectTableSnapshot> selectCollectTableSnapshot(Long dbConfigId, SqlSession session) {
+    public List<TableSnapshot> selectCollectTableSnapshot(Long dbConfigId, SqlSession session) {
         return snapshotRepository.selectCollectTableSnapshot(dbConfigId, session);
     }
 
-    public List<CollectColumnSnapshot> selectCollectColumnSnapshot(Long dbConfigId) {
+    public List<ColumnSnapshot> selectCollectColumnSnapshot(Long dbConfigId) {
         return snapshotRepository.selectCollectColumnSnapshot(dbConfigId);
     }
 
@@ -54,20 +55,23 @@ public class SnapshotService {
         snapshotRepository.deleteCollectedSnapshot(dbConfigId, session);
     }
 
-    public List<CurrentTableSnapshot> selectCurrentTableSnapshot(Long dbConfigId) {
+    public List<TableSnapshot> selectCurrentTableSnapshot(Long dbConfigId) {
         return snapshotRepository.selectCurrentTableSnapshot(dbConfigId);
     }
 
-    public List<CurrentColumnSnapshot> selectCurrentColumnSnapshot(Long dbConfigId) {
+    public List<ColumnSnapshot> selectCurrentColumnSnapshot(Long dbConfigId) {
         return snapshotRepository.selectCurrentColumnSnapshot(dbConfigId);
     }
 
-    public SnapshotBundle findSnapshotBundle(Long dbConfigId) {
-        List<CollectTableSnapshot> collectTables = snapshotRepository.selectCollectTableSnapshot(dbConfigId);
-        List<CurrentTableSnapshot> currentTables = snapshotRepository.selectCurrentTableSnapshot(dbConfigId);
-        List<CollectColumnSnapshot> collectColumns = snapshotRepository.selectCollectColumnSnapshot(dbConfigId);
-        List<CurrentColumnSnapshot> currentColumns = snapshotRepository.selectCurrentColumnSnapshot(dbConfigId);
+    public Snapshot findCollectSnapshot(Long dbConfigId) {
+        List<TableSnapshot> tables = snapshotRepository.selectCollectTableSnapshot(dbConfigId);
+        List<ColumnSnapshot> columns = snapshotRepository.selectCollectColumnSnapshot(dbConfigId);
+        return new Snapshot(SnapshotType.COLLECT, dbConfigId, null, tables, columns);
+    }
 
-        return new SnapshotBundle(collectTables, currentTables, collectColumns, currentColumns);
+    public Snapshot findCurrentSnapshot(Long dbConfigId) {
+        List<TableSnapshot> tables = snapshotRepository.selectCurrentTableSnapshot(dbConfigId);
+        List<ColumnSnapshot> columns = snapshotRepository.selectCurrentColumnSnapshot(dbConfigId);
+        return new Snapshot(SnapshotType.CURRENT, dbConfigId, null, tables, columns);
     }
 }

@@ -1,20 +1,29 @@
 package io.dbflow.domain;
 
-public class CurrentTableSnapshot {
-    private Long currentTableId;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TableSnapshot {
+    private Long tableSnapshotId;
     private Long commitLogId;
     private Long dbConfigId;
     private String tableName;
     private String tableComment;
     private String tableType;
     private String ownerName;
+    private Integer tableDeletedYn;
+    private final List<ColumnSnapshot> columns = new ArrayList<>();
 
-    public Long getCurrentTableId() {
-        return currentTableId;
+    public void addColumn(ColumnSnapshot column) {
+        columns.add(column);
     }
 
-    public void setCurrentTableId(Long currentTableId) {
-        this.currentTableId = currentTableId;
+    public Long getTableSnapshotId() {
+        return tableSnapshotId;
+    }
+
+    public void setTableSnapshotId(Long tableSnapshotId) {
+        this.tableSnapshotId = tableSnapshotId;
     }
 
     public Long getCommitLogId() {
@@ -63,5 +72,17 @@ public class CurrentTableSnapshot {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public Integer getTableDeletedYn() {
+        return tableDeletedYn;
+    }
+
+    public void setTableDeletedYn(Integer tableDeletedYn) {
+        this.tableDeletedYn = tableDeletedYn;
+    }
+
+    public List<ColumnSnapshot> getColumns() {
+        return columns;
     }
 }

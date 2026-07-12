@@ -1,7 +1,7 @@
 package io.dbflow.infrastructure.repository;
 
 import io.dbflow.application.MetadataCollectService;
-import io.dbflow.domain.CollectTableSnapshot;
+import io.dbflow.domain.TableSnapshot;
 import io.dbflow.domain.ColumnMetadata;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.DbConfig;
@@ -418,7 +418,7 @@ class SnapshotCommitRepositoryTest {
         }
 
         @Override
-        public List<ColumnMetadata> collectColumnSnapshotList(DbConfig dbConfig, List<CollectTableSnapshot> tableSnapshot) {
+        public List<ColumnMetadata> collectColumnSnapshotList(DbConfig dbConfig, List<TableSnapshot> tableSnapshot) {
             throw new IllegalStateException("column collect failed");
         }
     }

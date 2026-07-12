@@ -51,7 +51,7 @@ public class MetadataCollectService {
 
     public void columnCollect(DbConfig dbConfig) {
         // 1. 이미 저장된 테이블 스냅샷 조회
-        List<CollectTableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId());
+        List<TableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId());
 
         // 5. SQLite에 컬럼 스냅샷 저장
         snapshotService.insertColumnSnapshotList(createColumnSnapshotList(dbConfig, tableSnapshotList));
@@ -59,25 +59,25 @@ public class MetadataCollectService {
 
     public void columnCollect(DbConfig dbConfig, SqlSession session) {
         // 1. 이미 저장된 테이블 스냅샷 조회
-        List<CollectTableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId(), session);
+        List<TableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId(), session);
 
         // 5. SQLite에 컬럼 스냅샷 저장
         snapshotService.insertColumnSnapshotList(createColumnSnapshotList(dbConfig, tableSnapshotList), session);
     }
 
-    private List<CollectColumnSnapshot> createColumnSnapshotList(DbConfig dbConfig, List<CollectTableSnapshot> tableSnapshotList) {
+    private List<ColumnSnapshot> createColumnSnapshotList(DbConfig dbConfig, List<TableSnapshot> tableSnapshotList) {
         // 2. 외부 DB에서 컬럼 메타정보 조회
         List<ColumnMetadata> columnMetadataList = metadataCollector.collectColumnSnapshotList(dbConfig, tableSnapshotList);
 
         // 3. tableName -> collectTableId Map 생성
         Map<String, Long> tableIdMap = tableSnapshotList.stream()
                 .collect(Collectors.toMap(
-                        CollectTableSnapshot::getTableName,
-                        CollectTableSnapshot::getCollectTableId
+                        TableSnapshot::getTableName,
+                        TableSnapshot::getTableSnapshotId
                 ));
 
         // 4. 컬럼 메타정보를 컬럼 스냅샷으로 변환
-        List<CollectColumnSnapshot> columnSnapshotList = new ArrayList<>();
+        List<ColumnSnapshot> columnSnapshotList = new ArrayList<>();
 
         for (ColumnMetadata columnMetadata : columnMetadataList) {
             Long collectTableId = tableIdMap.get(columnMetadata.getTableName());
@@ -86,9 +86,9 @@ public class MetadataCollectService {
                 throw new IllegalStateException("컬럼에 매칭되는 테이블 스냅샷이 없습니다. tableName=" + columnMetadata.getTableName() + ", columnName=" + columnMetadata.getColumnName());
             }
 
-            CollectColumnSnapshot columnSnapshot = new CollectColumnSnapshot();
+            ColumnSnapshot columnSnapshot = new ColumnSnapshot();
 
-            columnSnapshot.setCollectTableId(collectTableId);
+            columnSnapshot.setTableSnapshotId(collectTableId);
             columnSnapshot.setColumnName(columnMetadata.getColumnName());
             columnSnapshot.setColumnComment(columnMetadata.getColumnComment());
             columnSnapshot.setColumnOrder(columnMetadata.getColumnOrder());

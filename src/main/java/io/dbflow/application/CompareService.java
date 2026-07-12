@@ -1,11 +1,18 @@
 package io.dbflow.application;
 
-import io.dbflow.domain.*;
 import io.dbflow.common.enums.ChangeColumn;
 import io.dbflow.common.enums.ChangeType;
 import io.dbflow.common.enums.ComponentType;
 import io.dbflow.common.enums.ObjectType;
+import io.dbflow.domain.ColumnSnapshot;
+import io.dbflow.domain.Snapshot;
+import io.dbflow.domain.TableSnapshot;
+import io.dbflow.domain.WorkChange;
+import io.dbflow.domain.WorkComponent;
+import io.dbflow.domain.WorkDiffResult;
+import io.dbflow.domain.WorkTarget;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,32 +31,28 @@ public class CompareService {
 
     public WorkDiffResult compare(Long dbConfigId) {
         WorkDiffResult result = new WorkDiffResult();
+        Snapshot collectSnapshot = snapshotService.findCollectSnapshot(dbConfigId);
+        Snapshot currentSnapshot = snapshotService.findCurrentSnapshot(dbConfigId);
 
-        SnapshotBundle snapshot = snapshotService.findSnapshotBundle(dbConfigId);
-
-        compareTables(dbConfigId, snapshot, result);
-        compareColumns(snapshot, result);
+        compareTables(dbConfigId, collectSnapshot, currentSnapshot, result);
+        compareColumns(collectSnapshot, currentSnapshot, result);
 
         return result;
     }
 
-    private void compareTables(Long dbConfigId, SnapshotBundle snapshot, WorkDiffResult result) {
-        Map<String, CollectTableSnapshot> collectMap = snapshot.getCollectTableMap();
-        Map<String, CurrentTableSnapshot> currentMap = snapshot.getCurrentTableMap();
+    private void compareTables(Long dbConfigId, Snapshot collectSnapshot, Snapshot currentSnapshot, WorkDiffResult result) {
+        Map<String, TableSnapshot> collectMap = createTableMap(collectSnapshot);
+        Map<String, TableSnapshot> currentMap = createTableMap(currentSnapshot);
 
-        // 수집 정보 대상으로 현재 정보와 비교(신규, 수정)
         for (String tableName : collectMap.keySet()) {
-            //테이블 정보 수집
-            CollectTableSnapshot collect = collectMap.get(tableName);
-            CurrentTableSnapshot current = currentMap.get(tableName);
+            TableSnapshot collect = collectMap.get(tableName);
+            TableSnapshot current = currentMap.get(tableName);
 
-            //현재 테이블에 데이터가 없을 경우 신규 등록
             if (current == null) {
                 result.addTarget(new WorkTarget(dbConfigId, ObjectType.TABLE.name(), collect.getTableName(), collect.getTableComment(), ChangeType.ADD.name()));
                 continue;
             }
 
-            //현재 테이블이 있지만 테이블 설명이 다를 경우 수정
             WorkTarget target = null;
 
             if (!Objects.equals(collect.getTableComment(), current.getTableComment())) {
@@ -63,88 +66,76 @@ public class CompareService {
             }
         }
 
-        //현재 정보 대상으로 수집 정보와 비교(삭제)
         for (String tableName : currentMap.keySet()) {
             if (!collectMap.containsKey(tableName)) {
-                CurrentTableSnapshot current = currentMap.get(tableName);
+                TableSnapshot current = currentMap.get(tableName);
                 result.addTarget(new WorkTarget(dbConfigId, ObjectType.TABLE.name(), current.getTableName(), current.getTableComment(), ChangeType.DEL.name()));
             }
         }
     }
 
-    private void compareColumns(SnapshotBundle snapshot, WorkDiffResult result) {
-        //위에서 작업한 대상 목록을 맵으로 변환
+    private void compareColumns(Snapshot collectSnapshot, Snapshot currentSnapshot, WorkDiffResult result) {
         Map<String, WorkTarget> targetMap = result.getTargets()
                 .stream()
                 .collect(Collectors.toMap(WorkTarget::getObjectName, target -> target));
 
-        //수집, 현재 작업 정보
-        Map<String, CollectTableSnapshot> collectTableMap = snapshot.getCollectTableMap();
-        Map<String, CurrentTableSnapshot> currentTableMap = snapshot.getCurrentTableMap();
+        Map<String, TableSnapshot> collectTableMap = createTableMap(collectSnapshot);
+        Map<String, TableSnapshot> currentTableMap = createTableMap(currentSnapshot);
 
-        //수집한 테이블을 기준으로 반복문
         for (String tableName : collectTableMap.keySet()) {
             WorkTarget target = targetMap.get(tableName);
 
-            // 테이블 ADD / DEL은 컬럼 비교 제외
             if (target != null && !ChangeType.MOD.name().equals(target.getChangeType())) {
                 continue;
             }
 
-            // 현재에도 있고 수집에도 있는 테이블만 컬럼 비교
-            if (!currentTableMap.containsKey(tableName)) {
+            TableSnapshot currentTable = currentTableMap.get(tableName);
+            if (currentTable == null) {
                 continue;
             }
 
-            // 수정시
-            compareTableColumns(tableName, snapshot, result, targetMap);
+            compareTableColumns(collectTableMap.get(tableName), currentTable, result, targetMap);
         }
     }
 
-    private void compareTableColumns(String tableName, SnapshotBundle snapshot, WorkDiffResult result, Map<String, WorkTarget> targetMap) {
-        Map<String, CollectColumnSnapshot> collectColumnMap = snapshot.getCollectColumnMap(tableName);
-        Map<String, CurrentColumnSnapshot> currentColumnMap = snapshot.getCurrentColumnMap(tableName);
+    private void compareTableColumns(
+            TableSnapshot collectTable,
+            TableSnapshot currentTable,
+            WorkDiffResult result,
+            Map<String, WorkTarget> targetMap
+    ) {
+        Map<String, ColumnSnapshot> collectColumnMap = createColumnMap(collectTable);
+        Map<String, ColumnSnapshot> currentColumnMap = createColumnMap(currentTable);
 
-        //수집한 정보를 가지고 비교
         for (String columnName : collectColumnMap.keySet()) {
-            CollectColumnSnapshot collect = collectColumnMap.get(columnName);
-            CurrentColumnSnapshot current = currentColumnMap.get(columnName);
+            ColumnSnapshot collect = collectColumnMap.get(columnName);
+            ColumnSnapshot current = currentColumnMap.get(columnName);
+            WorkTarget target = targetMap.get(collectTable.getTableName());
 
-            //수집정보로 현재 작업했던 대상 정보 수집
-            WorkTarget target = targetMap.get(tableName);
-
-            //컬럼 신규 등록
             if (current == null) {
-                //이 컬럼이 속한 테이블이 없는 경우 workTarget 생성
-                target = getOrCreateModTarget(result, targetMap, collect);
-
+                target = getOrCreateModTarget(result, targetMap, collectTable);
                 target.addComponent(new WorkComponent(ComponentType.COLUMN.name(), collect.getColumnName(), collect.getColumnComment(), ChangeType.ADD.name()));
                 continue;
             }
 
-            //컬럼 수정 등록 (컴포넌트를 만들어 한 번에 대상에 저장)
             WorkComponent component = compareColumnProperties(collect, current);
 
             if (component != null) {
-                target = getOrCreateModTarget(result, targetMap, collect);
-
+                target = getOrCreateModTarget(result, targetMap, collectTable);
                 target.addComponent(component);
             }
         }
 
-        // 현재 작업을 비교
         for (String columnName : currentColumnMap.keySet()) {
             if (!collectColumnMap.containsKey(columnName)) {
-                CurrentColumnSnapshot current = currentColumnMap.get(columnName);
-                WorkTarget target = getOrCreateModTarget(result, targetMap, current);
-
-                target.addComponent(new WorkComponent(ComponentType.COLUMN.name(), current.getColumnName(), current.getColumnComment(), ChangeType.DEL.name()
-                ));
+                ColumnSnapshot current = currentColumnMap.get(columnName);
+                WorkTarget target = getOrCreateModTarget(result, targetMap, collectTable);
+                target.addComponent(new WorkComponent(ComponentType.COLUMN.name(), current.getColumnName(), current.getColumnComment(), ChangeType.DEL.name()));
             }
         }
     }
 
-    private WorkComponent compareColumnProperties(CollectColumnSnapshot collect, CurrentColumnSnapshot current) {
+    private WorkComponent compareColumnProperties(ColumnSnapshot collect, ColumnSnapshot current) {
         WorkComponent component = new WorkComponent(ComponentType.COLUMN.name(), collect.getColumnName(), collect.getColumnComment(), ChangeType.MOD.name());
 
         addChangeIfDifferent(component, ChangeColumn.COLUMN_ORDER, current.getColumnOrder(), collect.getColumnOrder());
@@ -170,26 +161,39 @@ public class CompareService {
         }
     }
 
-    private WorkTarget getOrCreateModTarget(WorkDiffResult result, Map<String, WorkTarget> targetMap, CollectColumnSnapshot column) {
-        return getOrCreateModTarget(result, targetMap, column.getTableName(), column.getTableComment());
-    }
-
-    private WorkTarget getOrCreateModTarget(WorkDiffResult result, Map<String, WorkTarget> targetMap, CurrentColumnSnapshot column) {
-        return getOrCreateModTarget(result, targetMap, column.getTableName(), column.getTableComment());
-    }
-
-    private WorkTarget getOrCreateModTarget(WorkDiffResult result, Map<String, WorkTarget> targetMap, String tableName, String tableComment) {
-        WorkTarget target = targetMap.get(tableName);
+    private WorkTarget getOrCreateModTarget(WorkDiffResult result, Map<String, WorkTarget> targetMap, TableSnapshot table) {
+        WorkTarget target = targetMap.get(table.getTableName());
 
         if (target != null) {
             return target;
         }
 
-        target = new WorkTarget(null, ObjectType.TABLE.name(), tableName, tableComment, ChangeType.MOD.name());
-
+        target = new WorkTarget(null, ObjectType.TABLE.name(), table.getTableName(), table.getTableComment(), ChangeType.MOD.name());
         result.addTarget(target);
-        targetMap.put(tableName, target);
+        targetMap.put(table.getTableName(), target);
 
         return target;
+    }
+
+    private Map<String, TableSnapshot> createTableMap(Snapshot snapshot) {
+        Map<String, TableSnapshot> tableMap = new LinkedHashMap<>();
+        for (TableSnapshot table : snapshot.getTables()) {
+            TableSnapshot duplicate = tableMap.put(table.getTableName(), table);
+            if (duplicate != null) {
+                throw new IllegalStateException("중복된 테이블 이름이 있습니다. tableName=" + table.getTableName());
+            }
+        }
+        return tableMap;
+    }
+
+    private Map<String, ColumnSnapshot> createColumnMap(TableSnapshot table) {
+        Map<String, ColumnSnapshot> columnMap = new LinkedHashMap<>();
+        for (ColumnSnapshot column : table.getColumns()) {
+            ColumnSnapshot duplicate = columnMap.put(column.getColumnName(), column);
+            if (duplicate != null) {
+                throw new IllegalStateException("중복된 컬럼 이름이 있습니다. tableName=" + table.getTableName() + ", columnName=" + column.getColumnName());
+            }
+        }
+        return columnMap;
     }
 }

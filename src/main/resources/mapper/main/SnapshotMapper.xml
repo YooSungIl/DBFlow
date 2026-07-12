@@ -32,7 +32,7 @@
         VALUES
         <foreach collection="list" item="item" separator=",">
             (
-            #{item.collectTableId},
+            #{item.tableSnapshotId},
             #{item.columnName},
             #{item.columnComment},
             #{item.columnOrder},
@@ -47,8 +47,8 @@
         </foreach>
     </insert>
 
-    <select id="selectCollectTableSnapshot" resultType="io.dbflow.domain.CollectTableSnapshot">
-        SELECT COLLECT_TABLE_ID
+    <select id="selectCollectTableSnapshot" resultType="io.dbflow.domain.TableSnapshot">
+        SELECT COLLECT_TABLE_ID AS TABLE_SNAPSHOT_ID
              , DB_CONFIG_ID
              , TABLE_NAME
              , TABLE_COMMENT
@@ -58,12 +58,9 @@
          WHERE DB_CONFIG_ID = #{dbConfigId}
     </select>
 
-    <select id="selectCollectColumnSnapshot" resultType="io.dbflow.domain.CollectColumnSnapshot">
-        SELECT COL.COLLECT_COLUMN_ID
-             , COL.COLLECT_TABLE_ID
-             , TBL.TABLE_NAME
-             , TBL.TABLE_COMMENT
-             , TBL.TABLE_TYPE
+    <select id="selectCollectColumnSnapshot" resultType="io.dbflow.domain.ColumnSnapshot">
+        SELECT COL.COLLECT_COLUMN_ID AS COLUMN_SNAPSHOT_ID
+             , COL.COLLECT_TABLE_ID AS TABLE_SNAPSHOT_ID
              , COL.COLUMN_NAME
              , COL.COLUMN_COMMENT
              , COL.COLUMN_ORDER
@@ -92,8 +89,8 @@
                                      WHERE DB_CONFIG_ID = #{dbConfigId})
     </delete>
 
-    <select id="selectCurrentTableSnapshot" resultType="io.dbflow.domain.CurrentTableSnapshot">
-        SELECT CURRENT_TABLE_ID
+    <select id="selectCurrentTableSnapshot" resultType="io.dbflow.domain.TableSnapshot">
+        SELECT CURRENT_TABLE_ID AS TABLE_SNAPSHOT_ID
              , COMMIT_LOG_ID
              , DB_CONFIG_ID
              , TABLE_NAME
@@ -104,12 +101,9 @@
          WHERE DB_CONFIG_ID = #{dbConfigId}
     </select>
 
-    <select id="selectCurrentColumnSnapshot" resultType="io.dbflow.domain.CurrentColumnSnapshot">
-        SELECT COL.CURRENT_COLUMN_ID
-             , COL.CURRENT_TABLE_ID
-             , TBL.TABLE_NAME
-             , TBL.TABLE_COMMENT
-             , TBL.TABLE_TYPE
+    <select id="selectCurrentColumnSnapshot" resultType="io.dbflow.domain.ColumnSnapshot">
+        SELECT COL.CURRENT_COLUMN_ID AS COLUMN_SNAPSHOT_ID
+             , COL.CURRENT_TABLE_ID AS TABLE_SNAPSHOT_ID
              , COL.COLUMN_NAME
              , COL.COLUMN_COMMENT
              , COL.COLUMN_ORDER

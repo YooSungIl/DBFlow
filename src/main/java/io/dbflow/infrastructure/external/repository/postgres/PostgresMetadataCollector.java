@@ -1,10 +1,10 @@
 package io.dbflow.infrastructure.external.repository.postgres;
 
 import io.dbflow.common.Exception.RepositoryException;
-import io.dbflow.domain.CollectTableSnapshot;
 import io.dbflow.domain.ColumnMetadata;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.domain.TableMetadata;
+import io.dbflow.domain.TableSnapshot;
 import io.dbflow.infrastructure.external.repository.MetadataCollector;
 import io.dbflow.infrastructure.external.repository.postgres.mapper.PostgresMetadataCollectorMapper;
 import io.dbflow.infrastructure.mybatis.ExternalMyBatisSqlSessionFactory;
@@ -25,7 +25,7 @@ public class PostgresMetadataCollector implements MetadataCollector {
     }
 
     @Override
-    public List<ColumnMetadata> collectColumnSnapshotList(DbConfig dbConfig, List<CollectTableSnapshot> tableSnapshot) {
+    public List<ColumnMetadata> collectColumnSnapshotList(DbConfig dbConfig, List<TableSnapshot> tableSnapshot) {
         try (SqlSession session = ExternalMyBatisSqlSessionFactory.getSqlSessionFactory(dbConfig).openSession()) {
             PostgresMetadataCollectorMapper mapper = session.getMapper(PostgresMetadataCollectorMapper.class);
             return mapper.collectColumnSnapshotList(dbConfig, tableSnapshot);
