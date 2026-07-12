@@ -16,7 +16,7 @@ public class ConsoleHelper {
     }
 
     public static void error(String message) {
-        System.out.println();
+        System.err.println();
         System.err.println("❌ " + message);
     }
 

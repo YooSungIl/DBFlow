@@ -38,16 +38,11 @@ public class WorkSetCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            if (dbAlias == null || dbAlias.isBlank()) {
-                dbAlias = promptHelper.inputRequired("DB별칭", CommonValidation::required);
-            }
-
-            workService.setWork(dbAlias);
-
-            ConsoleHelper.success("DB작업 공간이 " + "'" + dbAlias + "'으로 변경 되었습니다.");
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
+        if (dbAlias == null || dbAlias.isBlank()) {
+            dbAlias = promptHelper.inputRequired("DB별칭", CommonValidation::required);
         }
+
+        workService.setWork(dbAlias);
+        ConsoleHelper.success("DB작업 공간이 " + "'" + dbAlias + "'으로 변경 되었습니다.");
     }
 }

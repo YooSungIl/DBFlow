@@ -37,27 +37,19 @@ public class ConnectAddCommand implements Runnable {
 
     @Override
     public void run() {
+        userService.checkUserExists();
 
-        try {
-            userService.checkUserExists();
+        String dbAlias = promptHelper.inputRequired("DB별칭", connectService::validateNewAlias);
+        String dbType = promptHelper.inputSelect("지원하는 DBMS종류를 선택해 주세요.", List.of("POSTGRESQL"));
+        String dbHost = promptHelper.inputRequired("Host", CommonValidation::required);
+        Integer dbPort = promptHelper.inputRequiredInt("Port", CommonValidation::validatePort);
+        String dbName = promptHelper.inputRequired("Database", CommonValidation::required);
+        String dbSchema = promptHelper.inputRequired("Schema", CommonValidation::required);
+        String dbUser = promptHelper.inputRequired("UserName", CommonValidation::required);
+        String dbPassword = promptHelper.inputRequired("Password", CommonValidation::required);
 
-            String dbAlias = promptHelper.inputRequired("DB별칭", connectService::validateNewAlias);
-            String dbType = promptHelper.inputSelect("지원하는 DBMS종류를 선택해 주세요.", List.of("POSTGRESQL"));
-            String dbHost = promptHelper.inputRequired("Host", CommonValidation::required);
-            Integer dbPort = promptHelper.inputRequiredInt("Port", CommonValidation::validatePort);
-            String dbName = promptHelper.inputRequired("Database", CommonValidation::required);
-            String dbSchema = promptHelper.inputRequired("Schema", CommonValidation::required);
-            String dbUser = promptHelper.inputRequired("UserName", CommonValidation::required);
-            String dbPassword = promptHelper.inputRequired("Password", CommonValidation::required);
-
-            DbConfig dbConfig = new DbConfig(dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword);
-
-
-            connectService.saveDbConnect(dbConfig);
-
-            ConsoleHelper.success("DB접속 정보가 저장되었습니다.");
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
-        }
+        DbConfig dbConfig = new DbConfig(dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword);
+        connectService.saveDbConnect(dbConfig);
+        ConsoleHelper.success("DB접속 정보가 저장되었습니다.");
     }
 }

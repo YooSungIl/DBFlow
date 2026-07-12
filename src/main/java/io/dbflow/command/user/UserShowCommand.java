@@ -33,26 +33,22 @@ public class UserShowCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            User user = userService.findActiveUser();
-            if (user == null) {
-                ConsoleHelper.info("등록된 사용자 정보가 없습니다.");
-                ConsoleHelper.info("사용자 정보를 먼저 등록합니다.");
+        User user = userService.findActiveUser();
+        if (user == null) {
+            ConsoleHelper.info("등록된 사용자 정보가 없습니다.");
+            ConsoleHelper.info("사용자 정보를 먼저 등록합니다.");
 
-                String name = promptHelper.inputRequired("사용자명", CommonValidation::required);
-                String email = promptHelper.inputRequired("이메일", CommonValidation::validateEmail);
+            String name = promptHelper.inputRequired("사용자명", CommonValidation::required);
+            String email = promptHelper.inputRequired("이메일", CommonValidation::validateEmail);
 
-                userService.saveUserConfig(name, email);
-                ConsoleHelper.success("사용자 정보가 저장되었습니다.");
+            userService.saveUserConfig(name, email);
+            ConsoleHelper.success("사용자 정보가 저장되었습니다.");
 
-                user = userService.findActiveUser();
-            }
-
-            System.out.println();
-            System.out.println("이름 : " + user.getUserName());
-            System.out.println("이메일 : " + user.getUserEmail());
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
+            user = userService.findActiveUser();
         }
+
+        System.out.println();
+        System.out.println("이름 : " + user.getUserName());
+        System.out.println("이메일 : " + user.getUserEmail());
     }
 }

@@ -36,15 +36,11 @@ public class CommitCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String title = promptHelper.inputRequired("Commit title", CommonValidation::required);
-            String content = promptHelper.inputMultiLine("Commit description");
+        String title = promptHelper.inputRequired("Commit title", CommonValidation::required);
+        String content = promptHelper.inputMultiLine("Commit description");
 
-            commitService.commit(title, content);
-            ConsoleHelper.success("커밋이 완료되었습니다.");
-            ConsoleHelper.info("Commit title : " + title);
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
-        }
+        commitService.commit(title, content);
+        ConsoleHelper.success("커밋이 완료되었습니다.");
+        ConsoleHelper.info("Commit title : " + title);
     }
 }

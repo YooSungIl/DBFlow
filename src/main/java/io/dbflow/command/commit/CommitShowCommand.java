@@ -38,21 +38,16 @@ public class CommitShowCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            if (objectName == null || objectName.isEmpty()) {
-                CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
-                ConsoleHelper.commitLogInfo(commitLogView);
-                ConsoleHelper.printCommitTargetList(commitLogView.getTargets());
-            } else if (componentName == null || componentName.isEmpty()) {
-                CommitLogView commitLogView = commitService.commitObjectDetail(commitLogId, objectName);
-                ConsoleHelper.commitTargetInfo(commitLogView);
-            } else {
-                CommitLogView commitLogView = commitService.commitComponentDetail(commitLogId, objectName, componentName);
-                ConsoleHelper.commitComponentInfo(commitLogView);
-            }
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
+        if (objectName == null || objectName.isEmpty()) {
+            CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
+            ConsoleHelper.commitLogInfo(commitLogView);
+            ConsoleHelper.printCommitTargetList(commitLogView.getTargets());
+        } else if (componentName == null || componentName.isEmpty()) {
+            CommitLogView commitLogView = commitService.commitObjectDetail(commitLogId, objectName);
+            ConsoleHelper.commitTargetInfo(commitLogView);
+        } else {
+            CommitLogView commitLogView = commitService.commitComponentDetail(commitLogId, objectName, componentName);
+            ConsoleHelper.commitComponentInfo(commitLogView);
         }
-
     }
 }

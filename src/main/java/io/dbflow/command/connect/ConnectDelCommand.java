@@ -31,13 +31,8 @@ public class ConnectDelCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            DbConfig dbConfig = new DbConfig(dbAlias);
-            connectService.deleteDbConfig(dbConfig);
-
-            ConsoleHelper.success("'" + dbAlias + "' 비활성화 처리가 되었습니다.");
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
-        }
+        DbConfig dbConfig = new DbConfig(dbAlias);
+        connectService.deleteDbConfig(dbConfig);
+        ConsoleHelper.success("'" + dbAlias + "' 비활성화 처리가 되었습니다.");
     }
 }

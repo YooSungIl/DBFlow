@@ -39,21 +39,15 @@ public class UserSetCommand implements Runnable {
 
     @Override
     public void run() {
-
-        try {
-            if (name == null || name.isBlank()) {
-                name = promptHelper.inputRequired("사용자명", CommonValidation::required);
-            }
-
-            if (email == null || email.isBlank()) {
-                email = promptHelper.inputRequired("이메일", CommonValidation::validateEmail);
-            }
-
-            userService.saveUserConfig(name, email);
-
-            ConsoleHelper.success("사용자 정보가 저장되었습니다.");
-        } catch (Exception e) {
-            ConsoleHelper.error(e.getMessage());
+        if (name == null || name.isBlank()) {
+            name = promptHelper.inputRequired("사용자명", CommonValidation::required);
         }
+
+        if (email == null || email.isBlank()) {
+            email = promptHelper.inputRequired("이메일", CommonValidation::validateEmail);
+        }
+
+        userService.saveUserConfig(name, email);
+        ConsoleHelper.success("사용자 정보가 저장되었습니다.");
     }
 }
