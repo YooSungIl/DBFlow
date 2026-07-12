@@ -18,7 +18,15 @@ import picocli.CommandLine.Command;
 )
 public class CommitCommand implements Runnable {
 
-    private final CommitService commitService = ServiceFactory.commitService();
+    private final CommitService commitService;
+
+    public CommitCommand() {
+        this(ServiceFactory.commitService());
+    }
+
+    public CommitCommand(CommitService commitService) {
+        this.commitService = commitService;
+    }
 
     @Override
     public void run() {

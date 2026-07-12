@@ -17,14 +17,23 @@ import java.util.List;
 )
 public class ConnectAddCommand implements Runnable {
 
+    private final UserService userService;
+    private final ConnectService connectService;
+
+    public ConnectAddCommand() {
+        this(ServiceFactory.userService(), ServiceFactory.connectService());
+    }
+
+    public ConnectAddCommand(UserService userService, ConnectService connectService) {
+        this.userService = userService;
+        this.connectService = connectService;
+    }
+
     @Override
     public void run() {
 
         try {
-            UserService userService = ServiceFactory.userService();
             userService.checkUserExists();
-
-            ConnectService connectService = ServiceFactory.connectService();
 
             String dbAlias = PromptHelper.inputRequired("DB별칭", connectService::validateNewAlias);
             String dbType = PromptHelper.inputSelect("지원하는 DBMS종류를 선택해 주세요.", List.of("POSTGRESQL"));

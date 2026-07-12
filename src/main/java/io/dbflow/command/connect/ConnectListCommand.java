@@ -14,10 +14,19 @@ import java.util.List;
 )
 public class ConnectListCommand implements Runnable {
 
+    private final ConnectService connectService;
+
+    public ConnectListCommand() {
+        this(ServiceFactory.connectService());
+    }
+
+    public ConnectListCommand(ConnectService connectService) {
+        this.connectService = connectService;
+    }
+
     @Override
     public void run() {
         try {
-            ConnectService connectService = ServiceFactory.connectService();
             List<DbConfig> dbConfig = connectService.findDbConfigList();
 
             if (dbConfig == null) {

@@ -10,10 +10,20 @@ import picocli.CommandLine.Command;
         description = "DB작업 공간 해제"
 )
 public class WorkDelCommand implements Runnable {
+
+    private final WorkService workService;
+
+    public WorkDelCommand() {
+        this(ServiceFactory.workService());
+    }
+
+    public WorkDelCommand(WorkService workService) {
+        this.workService = workService;
+    }
+
     @Override
     public void run() {
         try {
-            WorkService workService = ServiceFactory.workService();
             workService.delWork();
             ConsoleHelper.success("DB작업 공간이 정상적으로 해제되었습니다.");
         } catch (Exception e) {

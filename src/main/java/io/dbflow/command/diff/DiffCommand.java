@@ -14,9 +14,18 @@ import java.util.List;
 )
 public class DiffCommand implements Runnable {
 
+    private final DiffService diffService;
+
+    public DiffCommand() {
+        this(ServiceFactory.diffService());
+    }
+
+    public DiffCommand(DiffService diffService) {
+        this.diffService = diffService;
+    }
+
     @Override
     public void run() {
-        DiffService diffService = ServiceFactory.diffService();
         List<WorkTarget> targets = diffService.diff();
 
         WorkDiffPrinter.print(targets);

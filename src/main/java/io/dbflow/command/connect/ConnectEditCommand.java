@@ -17,6 +17,16 @@ import java.util.List;
 )
 public class ConnectEditCommand implements Runnable {
 
+    private final ConnectService connectService;
+
+    public ConnectEditCommand() {
+        this(ServiceFactory.connectService());
+    }
+
+    public ConnectEditCommand(ConnectService connectService) {
+        this.connectService = connectService;
+    }
+
     @Parameters(
             index = "0",
             description = "DB Alias"
@@ -26,7 +36,6 @@ public class ConnectEditCommand implements Runnable {
     @Override
     public void run() {
         try {
-            ConnectService connectService = ServiceFactory.connectService();
             DbConfig beforDbConfig = connectService.findDbConfig(dbAlias);
 
             String dbAlias = PromptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, beforDbConfig.getDbAlias());

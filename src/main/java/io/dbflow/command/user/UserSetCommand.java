@@ -14,6 +14,17 @@ import picocli.CommandLine.Option;
 )
 public class UserSetCommand implements Runnable {
 
+    private final UserService userService;
+
+    public UserSetCommand() {
+        this(ServiceFactory.userService());
+    }
+
+    public UserSetCommand(UserService userService) {
+        this.userService = userService;
+    }
+
+
     @Option(names = "--name")
     private String name;
 
@@ -32,7 +43,6 @@ public class UserSetCommand implements Runnable {
                 email = PromptHelper.inputRequired("이메일", CommonValidation::validateEmail);
             }
 
-            UserService userService = ServiceFactory.userService();
             userService.saveUserConfig(name, email);
 
             ConsoleHelper.success("사용자 정보가 저장되었습니다.");

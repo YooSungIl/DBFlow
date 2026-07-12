@@ -13,6 +13,16 @@ import picocli.CommandLine.Command;
 )
 public class ConnectShowCommand implements Runnable {
 
+    private final ConnectService connectService;
+
+    public ConnectShowCommand() {
+        this(ServiceFactory.connectService());
+    }
+
+    public ConnectShowCommand(ConnectService connectService) {
+        this.connectService = connectService;
+    }
+
     @Parameters(
             index = "0",
             description = "DB Alias"
@@ -22,7 +32,6 @@ public class ConnectShowCommand implements Runnable {
     @Override
     public void run() {
         try {
-            ConnectService connectService = ServiceFactory.connectService();
             DbConfig dbConfig = connectService.findDbConfig(dbAlias);
 
             if(dbConfig == null) {

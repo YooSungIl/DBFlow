@@ -14,6 +14,16 @@ import picocli.CommandLine.Parameters;
 )
 public class CommitShowCommand implements Runnable {
 
+    private final CommitService commitService;
+
+    public CommitShowCommand() {
+        this(ServiceFactory.commitService());
+    }
+
+    public CommitShowCommand(CommitService commitService) {
+        this.commitService = commitService;
+    }
+
     @Parameters(
             index = "0",
             description = "커밋ID"
@@ -29,7 +39,6 @@ public class CommitShowCommand implements Runnable {
     @Override
     public void run() {
         try {
-            CommitService commitService = ServiceFactory.commitService();
             if (objectName == null || objectName.isEmpty()) {
                 CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
                 ConsoleHelper.commitLogInfo(commitLogView);

@@ -13,6 +13,16 @@ import picocli.CommandLine.Parameters;
 )
 public class ConnectDelCommand implements Runnable {
 
+    private final ConnectService connectService;
+
+    public ConnectDelCommand() {
+        this(ServiceFactory.connectService());
+    }
+
+    public ConnectDelCommand(ConnectService connectService) {
+        this.connectService = connectService;
+    }
+
     @Parameters(
             index = "0",
             description = "DB Alias"
@@ -22,8 +32,6 @@ public class ConnectDelCommand implements Runnable {
     @Override
     public void run() {
         try {
-            ConnectService connectService = ServiceFactory.connectService();
-
             DbConfig dbConfig = new DbConfig(dbAlias);
             connectService.deleteDbConfig(dbConfig);
 

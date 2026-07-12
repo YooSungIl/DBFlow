@@ -15,6 +15,16 @@ import java.util.List;
 )
 public class CommitListCommand implements Runnable {
 
+    private final CommitService commitService;
+
+    public CommitListCommand() {
+        this(ServiceFactory.commitService());
+    }
+
+    public CommitListCommand(CommitService commitService) {
+        this.commitService = commitService;
+    }
+
     @Parameters(
             index = "0",
             arity = "0..1",
@@ -26,8 +36,6 @@ public class CommitListCommand implements Runnable {
     @Override
     public void run()  {
         try {
-            CommitService commitService = ServiceFactory.commitService();
-
             List<CommitLogView> commitLogList = commitService.commitLogList(limit);
             if (commitLogList == null || commitLogList.isEmpty()) {
                 ConsoleHelper.info("등록된 커밋 정보가 없습니다.");

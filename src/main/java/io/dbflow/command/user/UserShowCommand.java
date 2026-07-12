@@ -14,10 +14,20 @@ import picocli.CommandLine;
 )
 public class UserShowCommand implements Runnable {
 
+    private final UserService userService;
+
+    public UserShowCommand() {
+        this(ServiceFactory.userService());
+    }
+
+    public UserShowCommand(UserService userService) {
+        this.userService = userService;
+    }
+
+
     @Override
     public void run() {
         try {
-            UserService userService = ServiceFactory.userService();
             User user = userService.findActiveUser();
             if (user == null) {
                 ConsoleHelper.info("등록된 사용자 정보가 없습니다.");

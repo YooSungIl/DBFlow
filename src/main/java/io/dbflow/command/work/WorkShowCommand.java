@@ -12,10 +12,19 @@ import picocli.CommandLine.Command;
 )
 public class WorkShowCommand implements Runnable {
 
+    private final WorkService workService;
+
+    public WorkShowCommand() {
+        this(ServiceFactory.workService());
+    }
+
+    public WorkShowCommand(WorkService workService) {
+        this.workService = workService;
+    }
+
     @Override
     public void run() {
         try {
-            WorkService workService = ServiceFactory.workService();
             Work work = workService.showWork();
 
             System.out.println();

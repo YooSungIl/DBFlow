@@ -14,6 +14,16 @@ import picocli.CommandLine.Parameters;
 )
 public class WorkSetCommand implements Runnable {
 
+    private final WorkService workService;
+
+    public WorkSetCommand() {
+        this(ServiceFactory.workService());
+    }
+
+    public WorkSetCommand(WorkService workService) {
+        this.workService = workService;
+    }
+
     @Parameters(
             index = "0",
             description = "DB Alias"
@@ -27,7 +37,6 @@ public class WorkSetCommand implements Runnable {
                 dbAlias = PromptHelper.inputRequired("DB별칭", CommonValidation::required);
             }
 
-            WorkService workService = ServiceFactory.workService();
             workService.setWork(dbAlias);
 
             ConsoleHelper.success("DB작업 공간이 " + "'" + dbAlias + "'으로 변경 되었습니다.");
