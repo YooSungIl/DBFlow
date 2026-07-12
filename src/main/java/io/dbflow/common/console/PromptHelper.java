@@ -2,20 +2,28 @@ package io.dbflow.common.console;
 
 import io.dbflow.common.Exception.ValidationException;
 
+import java.io.Console;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class PromptHelper {
     private final Scanner scanner;
+    private final Console console;
 
     public PromptHelper() {
-        this(System.in);
+        this(System.in, System.console());
     }
 
     public PromptHelper(InputStream inputStream) {
+        this(inputStream, null);
+    }
+
+    private PromptHelper(InputStream inputStream, Console console) {
         this.scanner = new Scanner(inputStream);
+        this.console = console;
     }
 
     public String input(String label) {
@@ -32,6 +40,18 @@ public class PromptHelper {
         while (true) {
             try {
                 String value = input(label);
+                validator.accept(value);
+                return value;
+            } catch (ValidationException e) {
+                ConsoleHelper.error(e.getMessage());
+            }
+        }
+    }
+
+    public String inputRequiredPassword(String label, Consumer<String> validator) {
+        while (true) {
+            try {
+                String value = passwordInput(label, null);
                 validator.accept(value);
                 return value;
             } catch (ValidationException e) {
@@ -96,6 +116,22 @@ public class PromptHelper {
         }
     }
 
+    public String inputEditPassword(String label, Consumer<String> validator, String defaultValue) {
+        while (true) {
+            try {
+                String value = passwordInput(label, defaultValue);
+                if (value == null || value.isBlank()) {
+                    return defaultValue;
+                }
+
+                validator.accept(value);
+                return value;
+            } catch (ValidationException e) {
+                ConsoleHelper.error(e.getMessage());
+            }
+        }
+    }
+
     public Integer inputEditInt(String label, Consumer<Integer> validator, Integer defaultValue) {
         while (true) {
             try {
@@ -138,5 +174,25 @@ public class PromptHelper {
             sb.append(line).append(System.lineSeparator());
         }
         return sb.toString().trim();
+    }
+
+    private String passwordInput(String label, String defaultValue) {
+        if (console == null) {
+            return defaultValue == null ? input(label) : editInput(label, defaultValue);
+        }
+
+        String prompt = defaultValue == null
+                ? label + ": "
+                : label + " [" + defaultValue + "] : ";
+        char[] password = console.readPassword("%s", prompt);
+        if (password == null) {
+            return "";
+        }
+
+        try {
+            return new String(password).trim();
+        } finally {
+            Arrays.fill(password, '\0');
+        }
     }
 }

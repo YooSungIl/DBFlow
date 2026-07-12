@@ -15,6 +15,7 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConnectCommandsTest {
@@ -46,6 +47,7 @@ class ConnectCommandsTest {
             assertEquals(0, exitCode);
             assertTrue(output.standardOutput().contains("local"));
             assertTrue(output.standardOutput().contains("testdb"));
+            assertFalse(output.standardOutput().contains("password"));
         }
     }
 
@@ -60,6 +62,9 @@ class ConnectCommandsTest {
             assertEquals(0, exitCode);
             assertEquals("local", service.requestedAlias);
             assertTrue(output.standardOutput().contains("testdb"));
+            assertTrue(output.standardOutput().contains("DB Password: ********"));
+            assertFalse(output.standardOutput().contains("password"));
+            assertFalse(output.errorOutput().contains("password"));
         }
     }
 
@@ -89,6 +94,7 @@ class ConnectCommandsTest {
             assertEquals("local", service.updated.getDbAlias());
             assertEquals("localhost", service.updated.getDbHost());
             assertEquals(5432, service.updated.getDbPort());
+            assertEquals("password", service.updated.getDbPassword());
         }
     }
 

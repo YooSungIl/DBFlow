@@ -46,7 +46,7 @@ public class ConnectAddCommand implements Runnable {
         String dbName = promptHelper.inputRequired("Database", CommonValidation::required);
         String dbSchema = promptHelper.inputRequired("Schema", CommonValidation::required);
         String dbUser = promptHelper.inputRequired("UserName", CommonValidation::required);
-        String dbPassword = promptHelper.inputRequired("Password", CommonValidation::required);
+        String dbPassword = promptHelper.inputRequiredPassword("Password", CommonValidation::required);
 
         DbConfig dbConfig = new DbConfig(dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword);
         connectService.saveDbConnect(dbConfig);

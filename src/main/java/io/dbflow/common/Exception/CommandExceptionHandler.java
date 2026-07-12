@@ -21,7 +21,8 @@ public class CommandExceptionHandler implements CommandLine.IExecutionExceptionH
     private String resolveMessage(Exception exception) {
         if (exception instanceof ServiceException
                 || exception instanceof RepositoryException
-                || exception instanceof ValidationException) {
+                || exception instanceof ValidationException
+                || exception instanceof CryptoException) {
             String message = exception.getMessage();
             if (message != null && !message.isBlank()) {
                 return message;

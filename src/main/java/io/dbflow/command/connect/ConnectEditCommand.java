@@ -17,6 +17,8 @@ import java.util.List;
 )
 public class ConnectEditCommand implements Runnable {
 
+    private static final String MASKED_PASSWORD = "********";
+
     private final ConnectService connectService;
     private final PromptHelper promptHelper;
 
@@ -50,7 +52,8 @@ public class ConnectEditCommand implements Runnable {
         String dbName = promptHelper.inputEdit("DB Name", CommonValidation::required, beforDbConfig.getDbName());
         String dbSchema = promptHelper.inputEdit("DB Schema", CommonValidation::required, beforDbConfig.getDbSchema());
         String dbUser = promptHelper.inputEdit("DB User", CommonValidation::required, beforDbConfig.getDbUser());
-        String dbPassword = promptHelper.inputEdit("DB Password", CommonValidation::required, beforDbConfig.getDbPassword());
+        String dbPasswordInput = promptHelper.inputEditPassword("DB Password", CommonValidation::required, MASKED_PASSWORD);
+        String dbPassword = MASKED_PASSWORD.equals(dbPasswordInput) ? beforDbConfig.getDbPassword() : dbPasswordInput;
         Integer useYn = promptHelper.inputEditInt("DB useYn", CommonValidation::requiredInt, beforDbConfig.getUseYn());
 
         DbConfig dbConfig = new DbConfig(beforDbConfig.getDbConfigId(), dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword, useYn);

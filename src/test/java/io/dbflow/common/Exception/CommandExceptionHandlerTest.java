@@ -41,4 +41,18 @@ class CommandExceptionHandlerTest {
             assertFalse(output.errorOutput().contains("내부 상세 오류"));
         }
     }
+
+    @Test
+    void 암호화_예외는_안전한_전용_메시지를_표시한다() {
+        try (ConsoleOutputCapture output = new ConsoleOutputCapture()) {
+            int exitCode = exceptionHandler.handleExecutionException(
+                    new CryptoException(CryptoException.DECRYPTION_FAILED),
+                    null,
+                    null
+            );
+
+            assertEquals(CommandExitCode.EXECUTION_ERROR.getValue(), exitCode);
+            assertTrue(output.errorOutput().contains(CryptoException.DECRYPTION_FAILED));
+        }
+    }
 }

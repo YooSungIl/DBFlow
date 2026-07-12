@@ -48,6 +48,24 @@ class PromptHelperTest {
     }
 
     @Test
+    void Console이_없는_환경에서도_필수_비밀번호를_입력받는다() {
+        PromptHelper promptHelper = promptHelper("\nsecret-password\n");
+
+        String result = promptHelper.inputRequiredPassword("Password", CommonValidation::required);
+
+        assertEquals("secret-password", result);
+    }
+
+    @Test
+    void 비밀번호_편집값이_비어_있으면_마스킹_기본값을_반환한다() {
+        PromptHelper promptHelper = promptHelper("\n");
+
+        String result = promptHelper.inputEditPassword("Password", CommonValidation::required, "********");
+
+        assertEquals("********", result);
+    }
+
+    @Test
     void 빈_줄이_두_번_입력되면_여러_줄_입력을_종료한다() {
         PromptHelper promptHelper = promptHelper("첫 번째 줄\n두 번째 줄\n\n\n");
 

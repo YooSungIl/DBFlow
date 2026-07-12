@@ -45,7 +45,7 @@ public class ConnectShowCommand implements Runnable {
             System.out.println("DB Name: " + dbConfig.getDbName());
             System.out.println("DB Schema: " + dbConfig.getDbSchema());
             System.out.println("DB User: " + dbConfig.getDbUser());
-            System.out.println("DB Password: " + dbConfig.getDbPassword());
+            System.out.println("DB Password: ********");
             System.out.println("DB UseYN: " + dbConfig.getUseYn());
             System.out.println("Created AT: " + dbConfig.getCreatedAt());
             System.out.println("Updated AT: " + dbConfig.getUpdateAt());

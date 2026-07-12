@@ -2,6 +2,7 @@ package io.dbflow.infrastructure.mybatis;
 
 import io.dbflow.common.enums.DbType;
 import io.dbflow.domain.DbConfig;
+import io.dbflow.infrastructure.security.CredentialSecurity;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
@@ -50,7 +51,8 @@ public final class ExternalMyBatisSqlSessionFactory {
         dataSource.setDriver(dbType.getDriver());
         dataSource.setUrl(dbType.createUrl(dbConfig.getDbHost(), dbConfig.getDbPort(), dbConfig.getDbName()));
         dataSource.setUsername(dbConfig.getDbUser());
-        dataSource.setPassword(dbConfig.getDbPassword());
+        String password = CredentialSecurity.stringEncryptor().decrypt(dbConfig.getDbPassword());
+        dataSource.setPassword(password);
 
         return dataSource;
     }
