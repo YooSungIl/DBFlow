@@ -1,6 +1,6 @@
 package io.dbflow.dto;
 
-public class CommitComponentChangeView {
+public class CommitChangeDetailView {
 
     private String componentType;
     private String componentName;

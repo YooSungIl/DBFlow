@@ -33,7 +33,7 @@ public class CommitShowCommand implements Runnable {
             if (objectName == null || objectName.isEmpty()) {
                 CommitLogView commitLogView = commitService.commitTargetList(commitLogId);
                 ConsoleHelper.commitLogInfo(commitLogView);
-                ConsoleHelper.printCommitTargetList(commitLogView.getCommitTargetViewList());
+                ConsoleHelper.printCommitTargetList(commitLogView.getTargets());
             } else if (componentName == null || componentName.isEmpty()) {
                 CommitLogView commitLogView = commitService.commitObjectDetail(commitLogId, objectName);
                 ConsoleHelper.commitTargetInfo(commitLogView);

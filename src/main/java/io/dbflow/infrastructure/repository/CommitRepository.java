@@ -3,7 +3,7 @@ package io.dbflow.infrastructure.repository;
 import io.dbflow.common.Exception.RepositoryException;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.User;
-import io.dbflow.dto.CommitComponentChangeView;
+import io.dbflow.dto.CommitChangeDetailView;
 import io.dbflow.dto.CommitLogView;
 import io.dbflow.dto.CommitTargetView;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
@@ -50,12 +50,12 @@ public class CommitRepository {
                 throw new RepositoryException(RepositoryException.COMMIT_NOT_FOUND);
             }
 
-            List<CommitTargetView> commitTargetView = commitMapper.selectCommitTargetList(commitLogView.getCommitLogId());
-            if (commitTargetView == null || commitTargetView.isEmpty()) {
+            List<CommitTargetView> targets = commitMapper.selectCommitTargetList(commitLogView.getCommitLogId());
+            if (targets == null || targets.isEmpty()) {
                 throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
             }
 
-            commitLogView.setCommitTargetViewList(commitTargetView);
+            commitLogView.setTargets(targets);
             return commitLogView;
         } catch (Exception e) {
             throw new RepositoryException(e.getMessage());
@@ -77,13 +77,13 @@ public class CommitRepository {
                 throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
             }
 
-            List<CommitComponentChangeView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), null);
+            List<CommitChangeDetailView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), null);
             if (changes == null || changes.isEmpty()) {
                 throw new RepositoryException(RepositoryException.COMMIT_COMPONENT_NOT_FOUND);
             }
 
-            target.setCommitComponentChangeViews(changes);
-            commit.setCommitTargetViewList(List.of(target));
+            target.setChanges(changes);
+            commit.setTargets(List.of(target));
 
             return commit;
         }
@@ -104,13 +104,13 @@ public class CommitRepository {
                 throw new RepositoryException(RepositoryException.COMMIT_TARGET_NOT_FOUND);
             }
 
-            List<CommitComponentChangeView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), componentName);
+            List<CommitChangeDetailView> changes = commitMapper.selectCommitComponentChangeList(target.getCommitTargetId(), componentName);
             if (changes == null || changes.isEmpty()) {
                 throw new RepositoryException(RepositoryException.COMMIT_COMPONENT_NOT_FOUND);
             }
 
-            target.setCommitComponentChangeViews(changes);
-            commit.setCommitTargetViewList(List.of(target));
+            target.setChanges(changes);
+            commit.setTargets(List.of(target));
 
             return commit;
         }

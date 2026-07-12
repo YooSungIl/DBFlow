@@ -2,7 +2,7 @@ package io.dbflow.common.console;
 
 import com.github.freva.asciitable.AsciiTable;
 import io.dbflow.domain.DbConfig;
-import io.dbflow.dto.CommitComponentChangeView;
+import io.dbflow.dto.CommitChangeDetailView;
 import io.dbflow.dto.CommitLogView;
 import io.dbflow.dto.CommitTargetView;
 
@@ -40,7 +40,7 @@ public class ConsoleHelper {
 
     public static void commitTargetInfo(CommitLogView commitLogView) {
         CommitTargetView target = firstTarget(commitLogView);
-        List<CommitComponentChangeView> commitComponentChangeViewList = target.getCommitComponentChangeViews();
+        List<CommitChangeDetailView> changes = target.getChanges();
 
         System.out.println("Commit");
         System.out.println("----------------------------------------");
@@ -53,19 +53,19 @@ public class ConsoleHelper {
         System.out.println("CreateAt           : " + commitLogView.getCommitCreatedAt());
         System.out.println("----------------------------------------");
 
-        if(!commitComponentChangeViewList.isEmpty()) {
+        if(!changes.isEmpty()) {
             System.out.println();
             System.out.println("Commit Components, Changes");
 
-            printCommitComponentChangeList(commitComponentChangeViewList);
+            printCommitComponentChangeList(changes);
         }
     }
 
 
     public static void commitComponentInfo(CommitLogView commitLogView) {
         CommitTargetView target = firstTarget(commitLogView);
-        CommitComponentChangeView component = firstComponentChange(target);
-        List<CommitComponentChangeView> changeList = target.getCommitComponentChangeViews();
+        CommitChangeDetailView component = firstComponentChange(target);
+        List<CommitChangeDetailView> changes = target.getChanges();
 
         System.out.println("Commit");
         System.out.println("----------------------------------------");
@@ -80,11 +80,11 @@ public class ConsoleHelper {
         System.out.println("CreateAt              : " + commitLogView.getCommitCreatedAt());
         System.out.println("----------------------------------------");
 
-        if(!changeList.isEmpty()) {
+        if(!changes.isEmpty()) {
             System.out.println();
             System.out.println("Commit Changes");
 
-            printCommitChangeList(changeList);
+            printCommitChangeList(changes);
         }
     }
 
@@ -156,15 +156,15 @@ public class ConsoleHelper {
         System.out.println(AsciiTable.getTable(headers, data));
     }
 
-    public static void printCommitComponentChangeList(List<CommitComponentChangeView> commitComponentChangeViews) {
+    public static void printCommitComponentChangeList(List<CommitChangeDetailView> changes) {
         String[] headers = {
                 "No", "Change Type", "Component Type", "Component Name", "Change Column", "Before Value", "After Value"
         };
 
-        String[][] data = new String[commitComponentChangeViews.size()][headers.length];
+        String[][] data = new String[changes.size()][headers.length];
 
-        for (int i = 0; i < commitComponentChangeViews.size(); i++) {
-            CommitComponentChangeView c = commitComponentChangeViews.get(i);
+        for (int i = 0; i < changes.size(); i++) {
+            CommitChangeDetailView c = changes.get(i);
 
             data[i] = new String[] {
                     String.valueOf(i + 1),
@@ -180,15 +180,15 @@ public class ConsoleHelper {
         System.out.println(AsciiTable.getTable(headers, data));
     }
 
-    public static void printCommitChangeList(List<CommitComponentChangeView> commitComponentChangeViews) {
+    public static void printCommitChangeList(List<CommitChangeDetailView> changes) {
         String[] headers = {
                 "No", "Change Column", "Before Value", "After Value"
         };
 
-        String[][] data = new String[commitComponentChangeViews.size()][headers.length];
+        String[][] data = new String[changes.size()][headers.length];
 
-        for (int i = 0; i < commitComponentChangeViews.size(); i++) {
-            CommitComponentChangeView c = commitComponentChangeViews.get(i);
+        for (int i = 0; i < changes.size(); i++) {
+            CommitChangeDetailView c = changes.get(i);
 
             data[i] = new String[] {
                     String.valueOf(i + 1),
@@ -202,10 +202,10 @@ public class ConsoleHelper {
     }
 
     private static CommitTargetView firstTarget(CommitLogView commitLogView) {
-        return commitLogView.getCommitTargetViewList().get(0);
+        return commitLogView.getTargets().get(0);
     }
 
-    private static CommitComponentChangeView firstComponentChange(CommitTargetView target) {
-        return target.getCommitComponentChangeViews().get(0);
+    private static CommitChangeDetailView firstComponentChange(CommitTargetView target) {
+        return target.getChanges().get(0);
     }
 }

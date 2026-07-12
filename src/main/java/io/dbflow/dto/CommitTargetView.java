@@ -10,7 +10,7 @@ public class CommitTargetView {
     private String objectComment;
     private String changeType;
 
-    private List<CommitComponentChangeView> commitComponentChangeViews;
+    private List<CommitChangeDetailView> changes;
 
     public Long getCommitTargetId() {
         return commitTargetId;
@@ -52,11 +52,11 @@ public class CommitTargetView {
         this.changeType = changeType;
     }
 
-    public List<CommitComponentChangeView> getCommitComponentChangeViews() {
-        return commitComponentChangeViews;
+    public List<CommitChangeDetailView> getChanges() {
+        return changes;
     }
 
-    public void setCommitComponentChangeViews(List<CommitComponentChangeView> commitComponentChangeViews) {
-        this.commitComponentChangeViews = commitComponentChangeViews;
+    public void setChanges(List<CommitChangeDetailView> changes) {
+        this.changes = changes;
     }
 }

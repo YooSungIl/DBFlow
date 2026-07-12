@@ -12,7 +12,7 @@ public class CommitLogView {
     private Long userId;
     private String commitCreatedAt;
 
-    List<CommitTargetView> commitTargetViewList;
+    private List<CommitTargetView> targets;
 
     public Long getCommitLogId() {
         return commitLogId;
@@ -70,11 +70,11 @@ public class CommitLogView {
         this.commitCreatedAt = commitCreatedAt;
     }
 
-    public List<CommitTargetView> getCommitTargetViewList() {
-        return commitTargetViewList;
+    public List<CommitTargetView> getTargets() {
+        return targets;
     }
 
-    public void setCommitTargetViewList(List<CommitTargetView> commitTargetViewList) {
-        this.commitTargetViewList = commitTargetViewList;
+    public void setTargets(List<CommitTargetView> targets) {
+        this.targets = targets;
     }
 }

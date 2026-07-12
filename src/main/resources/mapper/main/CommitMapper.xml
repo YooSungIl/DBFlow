@@ -152,7 +152,7 @@
            AND DCT.OBJECT_NAME = #{objectName}
     </select>
 
-    <select id="selectCommitComponentChangeList" resultType="io.dbflow.dto.CommitComponentChangeView">
+    <select id="selectCommitComponentChangeList" resultType="io.dbflow.dto.CommitChangeDetailView">
         SELECT COM.COMPONENT_TYPE
              , COM.COMPONENT_NAME
              , COM.COMPONENT_COMMENT
