@@ -33,22 +33,10 @@ public class ConnectShowCommand implements Runnable {
     public void run() {
         DbConfig dbConfig = connectService.findDbConfig(dbAlias);
 
-        if(dbConfig == null) {
+        if (dbConfig == null) {
             ConsoleHelper.info("등록된 DB접속 정보가 없습니다.");
         } else {
-            System.out.println();
-            System.out.println("[" + dbAlias + "] DB접속 정보");
-            System.out.println("Alias: " + dbConfig.getDbAlias());
-            System.out.println("DB Type: " + dbConfig.getDbType());
-            System.out.println("DB Host: " + dbConfig.getDbHost());
-            System.out.println("DB Port: " + dbConfig.getDbPort());
-            System.out.println("DB Name: " + dbConfig.getDbName());
-            System.out.println("DB Schema: " + dbConfig.getDbSchema());
-            System.out.println("DB User: " + dbConfig.getDbUser());
-            System.out.println("DB Password: ********");
-            System.out.println("DB UseYN: " + dbConfig.getUseYn());
-            System.out.println("Created AT: " + dbConfig.getCreatedAt());
-            System.out.println("Updated AT: " + dbConfig.getUpdateAt());
+            ConsoleHelper.printDbConfig(dbAlias, dbConfig);
         }
     }
 }

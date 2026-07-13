@@ -4,12 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.common.security.StringEncryptor;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.infrastructure.security.CredentialSecurity;
 
-public class PostgresDbConnection implements DbConnection{
+public class PostgresDbConnection implements DbConnection {
 
     private final StringEncryptor passwordEncryptor;
 

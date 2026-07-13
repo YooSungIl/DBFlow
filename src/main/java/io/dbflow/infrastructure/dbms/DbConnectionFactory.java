@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.dbms;
 
-import io.dbflow.common.Exception.ValidationException;
+import io.dbflow.common.exception.ValidationException;
 
 public class DbConnectionFactory {
 

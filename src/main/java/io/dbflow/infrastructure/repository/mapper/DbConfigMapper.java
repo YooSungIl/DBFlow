@@ -8,7 +8,7 @@ public interface DbConfigMapper {
 
     void insert(DbConfig dbConfig);
 
-    List<DbConfig> findDbConfigList();
+    List<DbConfig> findDbConfigs();
 
     DbConfig findDbConfig(String dbAlias);
 

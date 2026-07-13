@@ -1,6 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.domain.User;
 import io.dbflow.infrastructure.repository.CommitRepository;
 import io.dbflow.infrastructure.repository.SnapshotRepository;

@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.repository;
 
-import io.dbflow.common.Exception.RepositoryException;
+import io.dbflow.common.exception.RepositoryException;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import io.dbflow.infrastructure.repository.mapper.DbConfigMapper;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DbConfigRepository {
 
-    public void saveOnlyOne(DbConfig dbConfig) {
+    public void saveDbConfig(DbConfig dbConfig) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {
             try {
                 DbConfigMapper dbConfigMapper = session.getMapper(DbConfigMapper.class);
@@ -23,10 +23,10 @@ public class DbConfigRepository {
         }
     }
 
-    public List<DbConfig> findDbConfigList() {
+    public List<DbConfig> findDbConfigs() {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession()) {
             DbConfigMapper dbConfigMapper = session.getMapper(DbConfigMapper.class);
-            return dbConfigMapper.findDbConfigList();
+            return dbConfigMapper.findDbConfigs();
         } catch (Exception e) {
             throw new RepositoryException(e.getMessage(), e);
         }

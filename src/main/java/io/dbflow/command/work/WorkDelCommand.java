@@ -23,7 +23,7 @@ public class WorkDelCommand implements Runnable {
 
     @Override
     public void run() {
-        workService.delWork();
+        workService.clearWork();
         ConsoleHelper.success("DB작업 공간이 정상적으로 해제되었습니다.");
     }
 }

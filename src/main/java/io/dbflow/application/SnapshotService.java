@@ -1,7 +1,10 @@
 package io.dbflow.application;
 
-import io.dbflow.domain.*;
 import io.dbflow.common.enums.SnapshotType;
+import io.dbflow.domain.ColumnSnapshot;
+import io.dbflow.domain.Snapshot;
+import io.dbflow.domain.TableMetadata;
+import io.dbflow.domain.TableSnapshot;
 import io.dbflow.infrastructure.repository.SnapshotRepository;
 import org.apache.ibatis.session.SqlSession;
 

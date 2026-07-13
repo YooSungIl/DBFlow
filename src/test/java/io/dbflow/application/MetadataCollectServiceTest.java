@@ -22,7 +22,7 @@ class MetadataCollectServiceTest {
         StubSnapshotService snapshotService = new StubSnapshotService(List.of());
         MetadataCollectService service = new MetadataCollectService(new StubMetadataCollector(List.of(metadata), List.of()), snapshotService);
 
-        service.tableCollect(dbConfig());
+        service.collectTables(dbConfig());
 
         assertEquals(100L, snapshotService.insertedDbConfigId);
         assertEquals(List.of(metadata), snapshotService.insertedTableMetadata);
@@ -37,7 +37,7 @@ class MetadataCollectServiceTest {
         StubSnapshotService snapshotService = new StubSnapshotService(List.of(table));
         MetadataCollectService service = new MetadataCollectService(new StubMetadataCollector(List.of(), List.of(metadata)), snapshotService);
 
-        service.columnCollect(dbConfig());
+        service.collectColumns(dbConfig());
 
         ColumnSnapshot column = snapshotService.insertedColumns.get(0);
         assertEquals(1L, column.getTableSnapshotId());
@@ -51,7 +51,7 @@ class MetadataCollectServiceTest {
         StubSnapshotService snapshotService = new StubSnapshotService(List.of());
         MetadataCollectService service = new MetadataCollectService(new StubMetadataCollector(List.of(), List.of(metadata)), snapshotService);
 
-        assertThrows(IllegalStateException.class, () -> service.columnCollect(dbConfig()));
+        assertThrows(IllegalStateException.class, () -> service.collectColumns(dbConfig()));
     }
 
     private DbConfig dbConfig() {

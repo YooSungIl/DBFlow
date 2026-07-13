@@ -4,7 +4,7 @@ import io.dbflow.application.MetadataCollectService;
 import io.dbflow.application.CommitService;
 import io.dbflow.application.UserService;
 import io.dbflow.application.WorkService;
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.domain.WorkChange;
 import io.dbflow.domain.WorkComponent;
 import io.dbflow.domain.WorkDiffResult;

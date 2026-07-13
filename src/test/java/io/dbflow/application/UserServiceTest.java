@@ -1,6 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.domain.User;
 import io.dbflow.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class UserServiceTest {
         }
 
         @Override
-        public void saveOnlyOne(User user) {
+        public void replaceActiveUser(User user) {
             savedUser = user;
         }
 

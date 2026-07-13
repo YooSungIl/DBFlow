@@ -1,6 +1,8 @@
 package io.dbflow.infrastructure.repository.mapper;
 
-import io.dbflow.domain.*;
+import io.dbflow.domain.ColumnSnapshot;
+import io.dbflow.domain.TableMetadata;
+import io.dbflow.domain.TableSnapshot;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

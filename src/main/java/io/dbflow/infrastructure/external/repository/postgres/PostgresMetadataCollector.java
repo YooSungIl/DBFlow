@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.external.repository.postgres;
 
-import io.dbflow.common.Exception.RepositoryException;
+import io.dbflow.common.exception.RepositoryException;
 import io.dbflow.domain.ColumnMetadata;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.domain.TableMetadata;

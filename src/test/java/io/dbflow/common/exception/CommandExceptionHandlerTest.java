@@ -1,4 +1,4 @@
-package io.dbflow.common.Exception;
+package io.dbflow.common.exception;
 
 import io.dbflow.common.enums.CommandExitCode;
 import io.dbflow.testsupport.ConsoleOutputCapture;

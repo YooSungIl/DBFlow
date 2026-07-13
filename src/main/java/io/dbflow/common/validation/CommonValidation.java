@@ -1,8 +1,11 @@
 package io.dbflow.common.validation;
 
-import io.dbflow.common.Exception.ValidationException;
+import io.dbflow.common.exception.ValidationException;
 
-public class CommonValidation {
+public final class CommonValidation {
+
+    private CommonValidation() {
+    }
 
     public static void required(String value) {
         if (value == null || value.isBlank()) {

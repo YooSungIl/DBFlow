@@ -1,8 +1,8 @@
 package io.dbflow.command.diff;
 
 import io.dbflow.application.DiffService;
-import io.dbflow.common.Exception.CommandExceptionHandler;
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.CommandExceptionHandler;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.common.enums.CommandExitCode;
 import io.dbflow.domain.WorkTarget;
 import io.dbflow.testsupport.ConsoleOutputCapture;

@@ -1,7 +1,5 @@
 package io.dbflow.domain;
 
-import java.util.List;
-
 public class CommitLog {
 
     private Long commitLogId;
@@ -10,8 +8,6 @@ public class CommitLog {
     private String commitContent;
     private Long userId;
     private String commitCreatedAt;
-
-    private List<WorkTarget> workTargets;
 
     public Long getCommitLogId() {
         return commitLogId;

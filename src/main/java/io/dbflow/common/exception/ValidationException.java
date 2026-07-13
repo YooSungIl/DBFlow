@@ -1,4 +1,4 @@
-package io.dbflow.common.Exception;
+package io.dbflow.common.exception;
 
 public class ValidationException extends RuntimeException {
     public static final String DUPLICATED_DB_ALIAS = "이미 존재하는 DB 별칭입니다.";

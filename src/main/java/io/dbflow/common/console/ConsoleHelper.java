@@ -2,13 +2,18 @@ package io.dbflow.common.console;
 
 import com.github.freva.asciitable.AsciiTable;
 import io.dbflow.domain.DbConfig;
+import io.dbflow.domain.User;
+import io.dbflow.domain.Work;
 import io.dbflow.dto.CommitChangeDetailView;
 import io.dbflow.dto.CommitLogView;
 import io.dbflow.dto.CommitTargetView;
 
 import java.util.List;
 
-public class ConsoleHelper {
+public final class ConsoleHelper {
+
+    private ConsoleHelper() {
+    }
 
     public static void success(String message) {
         System.out.println();
@@ -23,6 +28,40 @@ public class ConsoleHelper {
     public static void info(String message) {
         System.out.println("ℹ️ " + message);
         System.out.println();
+    }
+
+    public static void printUser(User user) {
+        System.out.println();
+        System.out.println("이름 : " + user.getUserName());
+        System.out.println("이메일 : " + user.getUserEmail());
+    }
+
+    public static void printWork(Work work) {
+        System.out.println();
+        System.out.println("이름 : " + work.getUserName());
+        System.out.println("이메일 : " + work.getUserEmail());
+        System.out.println("DB별칭 : " + work.getDbAlias());
+        System.out.println("DB종류 : " + work.getDbType());
+        System.out.println("DBHost : " + work.getDbHost());
+        System.out.println("DBPort : " + work.getDbPort());
+        System.out.println("DB명 : " + work.getDbName());
+        System.out.println("DBSchema : " + work.getDbSchema());
+    }
+
+    public static void printDbConfig(String dbAlias, DbConfig dbConfig) {
+        System.out.println();
+        System.out.println("[" + dbAlias + "] DB접속 정보");
+        System.out.println("Alias: " + dbConfig.getDbAlias());
+        System.out.println("DB Type: " + dbConfig.getDbType());
+        System.out.println("DB Host: " + dbConfig.getDbHost());
+        System.out.println("DB Port: " + dbConfig.getDbPort());
+        System.out.println("DB Name: " + dbConfig.getDbName());
+        System.out.println("DB Schema: " + dbConfig.getDbSchema());
+        System.out.println("DB User: " + dbConfig.getDbUser());
+        System.out.println("DB Password: ********");
+        System.out.println("DB UseYN: " + dbConfig.getUseYn());
+        System.out.println("Created AT: " + dbConfig.getCreatedAt());
+        System.out.println("Updated AT: " + dbConfig.getUpdateAt());
     }
 
     public static void commitLogInfo(CommitLogView commitLogView) {
@@ -53,14 +92,13 @@ public class ConsoleHelper {
         System.out.println("CreateAt           : " + commitLogView.getCommitCreatedAt());
         System.out.println("----------------------------------------");
 
-        if(!changes.isEmpty()) {
+        if (!changes.isEmpty()) {
             System.out.println();
             System.out.println("Commit Components, Changes");
 
             printCommitComponentChangeList(changes);
         }
     }
-
 
     public static void commitComponentInfo(CommitLogView commitLogView) {
         CommitTargetView target = firstTarget(commitLogView);
@@ -80,7 +118,7 @@ public class ConsoleHelper {
         System.out.println("CreateAt              : " + commitLogView.getCommitCreatedAt());
         System.out.println("----------------------------------------");
 
-        if(!changes.isEmpty()) {
+        if (!changes.isEmpty()) {
             System.out.println();
             System.out.println("Commit Changes");
 

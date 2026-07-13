@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.repository;
 
-import io.dbflow.common.Exception.RepositoryException;
+import io.dbflow.common.exception.RepositoryException;
 import io.dbflow.domain.User;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import io.dbflow.infrastructure.repository.mapper.UserMapper;
@@ -9,7 +9,7 @@ import org.apache.ibatis.session.SqlSession;
 public class UserRepository {
 
     //삭제 프로세스 고민 후 업데이트로 수정 필요
-    public void saveOnlyOne(User user) {
+    public void replaceActiveUser(User user) {
         try (SqlSession session = MainMyBatisSqlSessionFactory.getSqlSessionFactory().openSession(false)) {
             try {
                 UserMapper userMapper = session.getMapper(UserMapper.class);

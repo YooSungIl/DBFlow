@@ -157,7 +157,7 @@ class ConnectCommandsTest {
         }
 
         @Override
-        public List<DbConfig> findDbConfigList() {
+        public List<DbConfig> findDbConfigs() {
             return configs;
         }
     }

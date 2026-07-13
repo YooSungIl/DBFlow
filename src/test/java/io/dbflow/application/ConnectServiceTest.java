@@ -1,6 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ValidationException;
+import io.dbflow.common.exception.ValidationException;
 import io.dbflow.common.security.AesGcmStringEncryptor;
 import io.dbflow.common.security.StringEncryptor;
 import io.dbflow.domain.DbConfig;
@@ -95,7 +95,7 @@ class ConnectServiceTest {
         }
 
         @Override
-        public void saveOnlyOne(DbConfig dbConfig) {
+        public void saveDbConfig(DbConfig dbConfig) {
             savedPassword = dbConfig.getDbPassword();
         }
 

@@ -80,7 +80,7 @@ class WorkCommandsTest {
         }
 
         @Override
-        public void delWork() {
+        public void clearWork() {
             deleted = true;
         }
     }

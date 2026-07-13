@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.security;
 
-import io.dbflow.common.Exception.CryptoException;
+import io.dbflow.common.exception.CryptoException;
 import org.apache.ibatis.io.Resources;
 
 import java.io.InputStream;

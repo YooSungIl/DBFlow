@@ -22,7 +22,7 @@
         )
     </insert>
 
-    <select id="findDbConfigList" resultType="io.dbflow.domain.DbConfig">
+    <select id="findDbConfigs" resultType="io.dbflow.domain.DbConfig">
         SELECT DB_CONFIG_ID
              , DB_ALIAS
              , DB_TYPE

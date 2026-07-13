@@ -1,7 +1,11 @@
 package io.dbflow.infrastructure.repository;
 
-import io.dbflow.common.Exception.RepositoryException;
-import io.dbflow.domain.*;
+import io.dbflow.common.exception.RepositoryException;
+import io.dbflow.domain.Work;
+import io.dbflow.domain.WorkChange;
+import io.dbflow.domain.WorkComponent;
+import io.dbflow.domain.WorkDiffResult;
+import io.dbflow.domain.WorkTarget;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import io.dbflow.infrastructure.repository.mapper.WorkMapper;
 import org.apache.ibatis.session.SqlSession;

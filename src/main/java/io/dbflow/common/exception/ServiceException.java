@@ -1,4 +1,4 @@
-package io.dbflow.common.Exception;
+package io.dbflow.common.exception;
 
 public class ServiceException extends RuntimeException {
     public static final String USER_NOT_FOUND = "등록된 사용자 정보가 없습니다.";

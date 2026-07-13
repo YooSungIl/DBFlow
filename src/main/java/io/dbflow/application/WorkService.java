@@ -1,7 +1,11 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ServiceException;
-import io.dbflow.domain.*;
+import io.dbflow.common.exception.ServiceException;
+import io.dbflow.domain.DbConfig;
+import io.dbflow.domain.User;
+import io.dbflow.domain.Work;
+import io.dbflow.domain.WorkDiffResult;
+import io.dbflow.domain.WorkTarget;
 import io.dbflow.infrastructure.repository.DbConfigRepository;
 import io.dbflow.infrastructure.repository.UserRepository;
 import io.dbflow.infrastructure.repository.WorkRepository;
@@ -28,7 +32,6 @@ public class WorkService {
     }
 
     public void setWork(String alias) {
-
         User user = userRepository.findActiveUser();
 
         if (user == null) {
@@ -56,7 +59,7 @@ public class WorkService {
         return workInfo;
     }
 
-    public void delWork() {
+    public void clearWork() {
         User user = userRepository.findActiveUser();
 
         if (user == null) {
@@ -66,7 +69,7 @@ public class WorkService {
         userRepository.updateDelDbConfigId(user);
     }
 
-    public void diffResult(Long dbConfigId, WorkDiffResult result) {
+    public void saveDiffResult(Long dbConfigId, WorkDiffResult result) {
         workRepository.replace(dbConfigId, result);
     }
 
@@ -81,5 +84,4 @@ public class WorkService {
     public List<WorkTarget> findWorkTarget(Long dbConfigId) {
         return workRepository.findWorkTarget(dbConfigId);
     }
-
 }

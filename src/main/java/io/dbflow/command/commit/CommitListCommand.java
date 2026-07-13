@@ -34,7 +34,7 @@ public class CommitListCommand implements Runnable {
     private int limit;
 
     @Override
-    public void run()  {
+    public void run() {
         List<CommitLogView> commitLogList = commitService.commitLogList(limit);
         if (commitLogList == null || commitLogList.isEmpty()) {
             ConsoleHelper.info("등록된 커밋 정보가 없습니다.");

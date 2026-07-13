@@ -1,6 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.domain.DbConfig;
 import io.dbflow.domain.User;
 import io.dbflow.domain.Work;
@@ -60,7 +60,7 @@ class WorkServiceTest {
         StubUserRepository userRepository = new StubUserRepository(user);
         WorkService service = new WorkService(new StubDbConfigRepository(null), userRepository, new StubWorkRepository(null));
 
-        service.delWork();
+        service.clearWork();
 
         assertSame(user, userRepository.deletedWorkUser);
     }
@@ -69,7 +69,7 @@ class WorkServiceTest {
     void 사용자가_없으면_Work를_해제할_수_없다() {
         WorkService service = service(null, null, null);
 
-        ServiceException exception = assertThrows(ServiceException.class, service::delWork);
+        ServiceException exception = assertThrows(ServiceException.class, service::clearWork);
 
         assertEquals(ServiceException.USER_NOT_FOUND, exception.getMessage());
     }

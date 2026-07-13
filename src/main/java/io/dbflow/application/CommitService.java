@@ -1,6 +1,6 @@
 package io.dbflow.application;
 
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.common.DateTimeHelper;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.User;

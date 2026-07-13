@@ -6,7 +6,10 @@ import io.dbflow.domain.WorkTarget;
 
 import java.util.List;
 
-public class WorkDiffPrinter {
+public final class WorkDiffPrinter {
+
+    private WorkDiffPrinter() {
+    }
 
     public static void print(List<WorkTarget> targets) {
         System.out.println();

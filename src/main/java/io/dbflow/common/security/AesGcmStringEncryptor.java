@@ -1,6 +1,6 @@
 package io.dbflow.common.security;
 
-import io.dbflow.common.Exception.CryptoException;
+import io.dbflow.common.exception.CryptoException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

@@ -1,7 +1,10 @@
 package io.dbflow.infrastructure.repository;
 
-import io.dbflow.common.Exception.RepositoryException;
-import io.dbflow.domain.*;
+import io.dbflow.common.exception.RepositoryException;
+import io.dbflow.domain.ColumnSnapshot;
+import io.dbflow.domain.CommitLog;
+import io.dbflow.domain.TableMetadata;
+import io.dbflow.domain.TableSnapshot;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import io.dbflow.infrastructure.repository.mapper.SnapshotMapper;
 import org.apache.ibatis.session.SqlSession;

@@ -1,4 +1,4 @@
-package io.dbflow.common.Exception;
+package io.dbflow.common.exception;
 
 public class CryptoException extends RuntimeException {
     public static final String ENCRYPTION_FAILED = "DB 접속 비밀번호 암호화에 실패했습니다.";

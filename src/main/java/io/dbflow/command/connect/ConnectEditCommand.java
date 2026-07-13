@@ -43,20 +43,20 @@ public class ConnectEditCommand implements Runnable {
 
     @Override
     public void run() {
-        DbConfig beforDbConfig = connectService.findDbConfig(dbAlias);
+        DbConfig existingDbConfig = connectService.findDbConfig(dbAlias);
 
-        String dbAlias = promptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, beforDbConfig.getDbAlias());
+        String dbAlias = promptHelper.inputEdit("DB 별칭", connectService::validateNewAlias, existingDbConfig.getDbAlias());
         String dbType = promptHelper.inputSelect("DB 종류", List.of("POSTGRESQL"));
-        String dbHost = promptHelper.inputEdit("Host", CommonValidation::required, beforDbConfig.getDbHost());
-        Integer dbPort = promptHelper.inputEditInt("Port", CommonValidation::validatePort, beforDbConfig.getDbPort());
-        String dbName = promptHelper.inputEdit("DB Name", CommonValidation::required, beforDbConfig.getDbName());
-        String dbSchema = promptHelper.inputEdit("DB Schema", CommonValidation::required, beforDbConfig.getDbSchema());
-        String dbUser = promptHelper.inputEdit("DB User", CommonValidation::required, beforDbConfig.getDbUser());
+        String dbHost = promptHelper.inputEdit("Host", CommonValidation::required, existingDbConfig.getDbHost());
+        Integer dbPort = promptHelper.inputEditInt("Port", CommonValidation::validatePort, existingDbConfig.getDbPort());
+        String dbName = promptHelper.inputEdit("DB Name", CommonValidation::required, existingDbConfig.getDbName());
+        String dbSchema = promptHelper.inputEdit("DB Schema", CommonValidation::required, existingDbConfig.getDbSchema());
+        String dbUser = promptHelper.inputEdit("DB User", CommonValidation::required, existingDbConfig.getDbUser());
         String dbPasswordInput = promptHelper.inputEditPassword("DB Password", CommonValidation::required, MASKED_PASSWORD);
-        String dbPassword = MASKED_PASSWORD.equals(dbPasswordInput) ? beforDbConfig.getDbPassword() : dbPasswordInput;
-        Integer useYn = promptHelper.inputEditInt("DB useYn", CommonValidation::requiredInt, beforDbConfig.getUseYn());
+        String dbPassword = MASKED_PASSWORD.equals(dbPasswordInput) ? existingDbConfig.getDbPassword() : dbPasswordInput;
+        Integer useYn = promptHelper.inputEditInt("DB useYn", CommonValidation::requiredInt, existingDbConfig.getUseYn());
 
-        DbConfig dbConfig = new DbConfig(beforDbConfig.getDbConfigId(), dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword, useYn);
+        DbConfig dbConfig = new DbConfig(existingDbConfig.getDbConfigId(), dbAlias, dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword, useYn);
         connectService.updateDbConfig(dbConfig);
         ConsoleHelper.success("DB접속 정보가 성공적으로 업데이트 되었습니다.");
     }

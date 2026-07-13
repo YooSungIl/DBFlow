@@ -48,7 +48,7 @@ public class DiffService {
 
         WorkDiffResult result = compareService.compare(dbConfig.getDbConfigId());
 
-        workService.diffResult(dbConfig.getDbConfigId(), result);
+        workService.saveDiffResult(dbConfig.getDbConfigId(), result);
 
         return workService.findWorkDiff(dbConfig.getDbConfigId());
     }

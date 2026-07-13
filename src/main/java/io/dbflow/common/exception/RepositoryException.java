@@ -1,4 +1,4 @@
-package io.dbflow.common.Exception;
+package io.dbflow.common.exception;
 
 public class RepositoryException extends RuntimeException {
     public static final String COMMIT_NOT_FOUND = "등록된 커밋 정보가 없습니다.";

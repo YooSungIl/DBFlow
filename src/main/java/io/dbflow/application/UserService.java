@@ -1,7 +1,7 @@
 package io.dbflow.application;
 
 import io.dbflow.common.DateTimeHelper;
-import io.dbflow.common.Exception.ServiceException;
+import io.dbflow.common.exception.ServiceException;
 import io.dbflow.domain.User;
 import io.dbflow.infrastructure.repository.UserRepository;
 
@@ -16,7 +16,7 @@ public class UserService {
     public void saveUserConfig(String name, String email) {
         String now = DateTimeHelper.now();
         User user = new User(name.trim(), email.trim(), 1, now, now);
-        userRepository.saveOnlyOne(user);
+        userRepository.replaceActiveUser(user);
     }
 
     public User findActiveUser() {

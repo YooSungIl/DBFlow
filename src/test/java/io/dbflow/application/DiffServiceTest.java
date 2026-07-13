@@ -112,7 +112,7 @@ class DiffServiceTest {
         }
 
         @Override
-        public void diffResult(Long dbConfigId, WorkDiffResult result) {
+        public void saveDiffResult(Long dbConfigId, WorkDiffResult result) {
             savedDbConfigId = dbConfigId;
             savedResult = result;
         }

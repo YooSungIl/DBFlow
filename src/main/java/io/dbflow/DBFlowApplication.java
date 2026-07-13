@@ -1,7 +1,7 @@
 package io.dbflow;
 
 import io.dbflow.command.DbFlowCommand;
-import io.dbflow.common.Exception.CommandExceptionHandler;
+import io.dbflow.common.exception.CommandExceptionHandler;
 import picocli.CommandLine;
 
 public class DBFlowApplication {

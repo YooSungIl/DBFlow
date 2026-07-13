@@ -30,7 +30,6 @@ public class UserShowCommand implements Runnable {
         this.promptHelper = promptHelper;
     }
 
-
     @Override
     public void run() {
         User user = userService.findActiveUser();
@@ -47,8 +46,6 @@ public class UserShowCommand implements Runnable {
             user = userService.findActiveUser();
         }
 
-        System.out.println();
-        System.out.println("이름 : " + user.getUserName());
-        System.out.println("이메일 : " + user.getUserEmail());
+        ConsoleHelper.printUser(user);
     }
 }

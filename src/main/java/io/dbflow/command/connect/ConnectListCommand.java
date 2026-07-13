@@ -26,7 +26,7 @@ public class ConnectListCommand implements Runnable {
 
     @Override
     public void run() {
-        List<DbConfig> dbConfig = connectService.findDbConfigList();
+        List<DbConfig> dbConfig = connectService.findDbConfigs();
 
         if (dbConfig == null) {
             ConsoleHelper.info("등록된 DB접속 정보가 없습니다.");

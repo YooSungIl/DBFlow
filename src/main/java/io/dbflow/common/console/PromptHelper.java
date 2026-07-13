@@ -1,6 +1,6 @@
 package io.dbflow.common.console;
 
-import io.dbflow.common.Exception.ValidationException;
+import io.dbflow.common.exception.ValidationException;
 
 import java.io.Console;
 import java.io.InputStream;

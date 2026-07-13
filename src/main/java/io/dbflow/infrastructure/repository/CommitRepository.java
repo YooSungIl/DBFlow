@@ -1,6 +1,6 @@
 package io.dbflow.infrastructure.repository;
 
-import io.dbflow.common.Exception.RepositoryException;
+import io.dbflow.common.exception.RepositoryException;
 import io.dbflow.domain.CommitLog;
 import io.dbflow.domain.User;
 import io.dbflow.dto.CommitChangeDetailView;

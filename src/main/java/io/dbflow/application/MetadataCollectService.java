@@ -1,6 +1,10 @@
 package io.dbflow.application;
 
-import io.dbflow.domain.*;
+import io.dbflow.domain.ColumnMetadata;
+import io.dbflow.domain.ColumnSnapshot;
+import io.dbflow.domain.DbConfig;
+import io.dbflow.domain.TableMetadata;
+import io.dbflow.domain.TableSnapshot;
 import io.dbflow.infrastructure.external.repository.MetadataCollector;
 import io.dbflow.infrastructure.mybatis.MainMyBatisSqlSessionFactory;
 import org.apache.ibatis.session.SqlSession;
@@ -28,8 +32,8 @@ public class MetadataCollectService {
             try {
                 snapshotService.deleteCollectedSnapshot(dbConfig.getDbConfigId(), session);
 
-                tableCollect(dbConfig, session);
-                columnCollect(dbConfig, session);
+                collectTables(dbConfig, session);
+                collectColumns(dbConfig, session);
 
                 session.commit();
             } catch (Exception e) {
@@ -39,17 +43,17 @@ public class MetadataCollectService {
         }
     }
 
-    public void tableCollect(DbConfig dbConfig) {
+    public void collectTables(DbConfig dbConfig) {
         List<TableMetadata> tableMetadataList = metadataCollector.collectTableSnapshotList(dbConfig);
         snapshotService.insertTableSnapshotList(dbConfig.getDbConfigId(), tableMetadataList);
     }
 
-    public void tableCollect(DbConfig dbConfig, SqlSession session) {
+    public void collectTables(DbConfig dbConfig, SqlSession session) {
         List<TableMetadata> tableMetadataList = metadataCollector.collectTableSnapshotList(dbConfig);
         snapshotService.insertTableSnapshotList(dbConfig.getDbConfigId(), tableMetadataList, session);
     }
 
-    public void columnCollect(DbConfig dbConfig) {
+    public void collectColumns(DbConfig dbConfig) {
         // 1. 이미 저장된 테이블 스냅샷 조회
         List<TableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId());
 
@@ -57,7 +61,7 @@ public class MetadataCollectService {
         snapshotService.insertColumnSnapshotList(createColumnSnapshotList(dbConfig, tableSnapshotList));
     }
 
-    public void columnCollect(DbConfig dbConfig, SqlSession session) {
+    public void collectColumns(DbConfig dbConfig, SqlSession session) {
         // 1. 이미 저장된 테이블 스냅샷 조회
         List<TableSnapshot> tableSnapshotList = snapshotService.selectCollectTableSnapshot(dbConfig.getDbConfigId(), session);
 

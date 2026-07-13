@@ -1,6 +1,6 @@
 package io.dbflow.common.validation;
 
-import io.dbflow.common.Exception.ValidationException;
+import io.dbflow.common.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
