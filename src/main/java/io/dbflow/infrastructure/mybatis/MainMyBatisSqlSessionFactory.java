@@ -1,9 +1,9 @@
 package io.dbflow.infrastructure.mybatis;
 
+import io.dbflow.infrastructure.path.DbFlowPathResolver;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
@@ -23,6 +23,7 @@ public final class MainMyBatisSqlSessionFactory {
     private static final String PROPERTIES_RESOURCE = "dbflow.properties";
     private static final String MAPPER_PACKAGE = "io.dbflow.infrastructure.repository.mapper";
     private static final String MAPPER_XML_DIR = "mapper/main/";
+    private static final String SQLITE_URL_PREFIX = "jdbc:sqlite:";
 
     private static final SqlSessionFactory SQL_SESSION_FACTORY = build();
 
@@ -50,7 +51,7 @@ public final class MainMyBatisSqlSessionFactory {
         PooledDataSource dataSource = new PooledDataSource();
 
         dataSource.setDriver(properties.getProperty("db.driver"));
-        dataSource.setUrl(properties.getProperty("db.url"));
+        dataSource.setUrl(SQLITE_URL_PREFIX + DbFlowPathResolver.resolveDatabasePath());
         dataSource.setUsername(properties.getProperty("db.username", ""));
         dataSource.setPassword(properties.getProperty("db.password", ""));
 
@@ -70,7 +71,7 @@ public final class MainMyBatisSqlSessionFactory {
         configuration.setDefaultExecutorType(ExecutorType.SIMPLE);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.setCallSettersOnNulls(true);
-        configuration.setLogImpl(StdOutImpl.class);
+        MyBatisLogConfiguration.configure(configuration);
     }
 
     private static void registerMappers(Configuration configuration) throws Exception {

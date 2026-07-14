@@ -40,7 +40,7 @@ class SnapshotCommitRepositoryTest {
 
     @BeforeAll
     static void prepareTestDbFile() throws Exception {
-        Path dbDir = Path.of("build", "dbflow-test");
+        Path dbDir = Path.of("build", "dbflow-test", "data");
         Files.createDirectories(dbDir);
         Files.deleteIfExists(dbDir.resolve("dbflow.db"));
     }
@@ -275,6 +275,8 @@ class SnapshotCommitRepositoryTest {
 
     private static void dropTables(Statement statement) throws Exception {
         List<String> tables = List.of(
+                "DBF_SCHEMA_MIGRATION_HISTORY",
+                "DBF_SCHEMA_VERSION",
                 "DBF_HISTORY_INDEX_SNAPSHOT",
                 "DBF_HISTORY_COLUMN_SNAPSHOT",
                 "DBF_HISTORY_TABLE_SNAPSHOT",

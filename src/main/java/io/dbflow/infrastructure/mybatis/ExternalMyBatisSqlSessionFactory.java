@@ -6,7 +6,6 @@ import io.dbflow.infrastructure.security.CredentialSecurity;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
@@ -70,7 +69,7 @@ public final class ExternalMyBatisSqlSessionFactory {
         configuration.setDefaultExecutorType(ExecutorType.SIMPLE);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.setCallSettersOnNulls(true);
-        configuration.setLogImpl(StdOutImpl.class);
+        MyBatisLogConfiguration.configure(configuration);
     }
 
     private static void registerMappers(Configuration configuration, DbType dbType) throws Exception {

@@ -21,6 +21,7 @@ out/
 .idea/shelf/
 .idea/httpRequests/
 .idea/inspectionProfiles/
+.idea/sqldialects.xml
 
 ### Eclipse ###
 .apt_generated
@@ -33,6 +34,8 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+!/packaging/bin/
+!/packaging/bin/dbf
 
 ### NetBeans ###
 /nbproject/private/
@@ -48,4 +51,12 @@ bin/
 .DS_Store
 
 # DBFlow docs
-/docs/
+/docs/backup/
+/docs/sql/
+
+# Local AI project context
+/PROJECT_CONTEXT.md
+
+# DBFlow bundled Java Runtime cache
+/packaging/runtime/*.zip
+/packaging/runtime/*.part

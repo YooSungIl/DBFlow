@@ -11,7 +11,7 @@ class DbFlowSecurityPathResolverTest {
     @Test
     void SQLite_DB_경로를_기준으로_security_master_key_경로를_결정한다() {
         assertEquals(
-                Path.of("build/dbflow-test/security/master.key"),
+                Path.of("build/dbflow-test/security/master.key").toAbsolutePath().normalize(),
                 DbFlowSecurityPathResolver.resolveMasterKeyPath()
         );
     }

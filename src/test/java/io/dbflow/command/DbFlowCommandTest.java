@@ -1,6 +1,7 @@
 package io.dbflow.command;
 
 import io.dbflow.DBFlowApplication;
+import io.dbflow.common.DbFlowVersion;
 import io.dbflow.common.enums.CommandExitCode;
 import io.dbflow.testsupport.ConsoleOutputCapture;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ class DbFlowCommandTest {
 
         assertAll(
                 () -> assertTrue(subcommands.containsKey("user")),
+                () -> assertTrue(subcommands.containsKey("install")),
                 () -> assertTrue(subcommands.containsKey("connect")),
                 () -> assertTrue(subcommands.containsKey("work")),
                 () -> assertTrue(subcommands.containsKey("diff")),
@@ -61,7 +63,7 @@ class DbFlowCommandTest {
             int exitCode = DBFlowApplication.createCommandLine().execute("--version");
 
             assertEquals(CommandExitCode.SUCCESS.getValue(), exitCode);
-            assertTrue(output.standardOutput().contains("0.0.1"));
+            assertTrue(output.standardOutput().contains(DbFlowVersion.getAppVersion()));
         }
     }
 
